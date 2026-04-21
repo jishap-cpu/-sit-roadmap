@@ -1,0 +1,601 @@
+{
+  "generated": "2026-04-21T18:38:58Z",
+  "l1": [
+    {
+      "label": "Product Feature Completion",
+      "ws": "Product",
+      "pic": "Kyle",
+      "date": "2026-04-24",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "R18.0.0 VIP",
+      "ws": "Sys Int",
+      "pic": "Todd",
+      "date": "2026-04-24",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "R18.1.0 VIP",
+      "ws": "Sys Int",
+      "pic": "Todd",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "R18 x.x.x VIP",
+      "ws": "Sys Int",
+      "pic": "Todd",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "LKG Pre RC VIP",
+      "ws": "Sys Int",
+      "pic": "Todd",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "Zero Rel Blockers",
+      "ws": "Sys Int",
+      "pic": "Todd",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "Complete Fleet Transition to R18.0.0  VIP",
+      "ws": "Car Prioritization/Diversity",
+      "pic": "Toan",
+      "date": "",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "R18.0.0 VIP Approval"
+    },
+    {
+      "label": "L2PP Sweeping CA",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-04-26",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "L2PP Sweeping TX",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-06-07",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "L2PP Sweeping NJ",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-07-12",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "Sweeping - VnV Testing Completion",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-07-12",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "USA PMB/Scaling / Diversity Test Plan Strategy",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-04-22",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "USA PMB/Scaling / Diversity Test Execution Plan",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-04-27",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "USA Scaling (Diversity Tier1/Tier2 ) Testing Completion",
+      "ws": "Car Prioritization/Diversity",
+      "pic": "Toan",
+      "date": "2026-05-04",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "-PMB/Scaling / Diversity Test Plan Strategy\n-PMB/Scaling / Diversity Test Execution Plan"
+    },
+    {
+      "label": "EU PMB/Scaling / Diversity Test Plan Strategy",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "",
+      "statusText": "",
+      "st": "unspecified",
+      "dependency": ""
+    },
+    {
+      "label": "EU PMB/Scaling / Diversity Test Execution Plan",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "",
+      "statusText": "",
+      "st": "unspecified",
+      "dependency": ""
+    },
+    {
+      "label": "EU Scaling (Diversity)",
+      "ws": "InCar Testing",
+      "pic": "Bruce",
+      "date": "2026-04-27",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "R18.0.0 VIP Approval"
+    },
+    {
+      "label": "Triage & KPI Plan Completion",
+      "ws": "Triage",
+      "pic": "Jason",
+      "date": "2026-04-27",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": "-PMB/Scaling / Diversity Test Execution Plan"
+    },
+    {
+      "label": "R18 PMB Branch Off & Process",
+      "ws": "PMB",
+      "pic": "Gaurav",
+      "date": "2026-05-22",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "Product Feature Completion"
+    },
+    {
+      "label": "Integration Complete",
+      "ws": "Program",
+      "pic": "Moore",
+      "date": "2026-05-25",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "R18 PMB Branch Off"
+    },
+    {
+      "label": "SW Pre-Freeze",
+      "ws": "Program",
+      "pic": "Moore",
+      "date": "2026-06-08",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "Integration Complete"
+    },
+    {
+      "label": "SW Freeze / Harlock",
+      "ws": "Program",
+      "pic": "Moore",
+      "date": "2026-06-19",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "SW Pre-Freeze"
+    },
+    {
+      "label": "SW Freeze Mgmt Review",
+      "ws": "Program",
+      "pic": "Moore",
+      "date": "2026-06-24",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "SW Freeze / Harlock"
+    },
+    {
+      "label": "RPD",
+      "ws": "Program",
+      "pic": "Moore",
+      "date": "2026-07-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "SW Freeze Mgmt Review"
+    }
+  ],
+  "l2": [
+    {
+      "label": "Highway AMO SILC Feature in PMB",
+      "ws": "Product",
+      "pic": "Sourav Pramanik",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "Highway AMO SILC PMB Test Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Vinay",
+      "date": "2026-04-27",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": "R18.0.0 VIP Approval"
+    },
+    {
+      "label": "Highway AMO SILC DAG /Config Updates",
+      "ws": "Product",
+      "pic": "Xiao Bo",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "Highway AMO SILC Digital Replay Testing Enablement",
+      "ws": "PMB",
+      "pic": "Amit",
+      "date": "2026-04-24",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "Highway AMO SILC  Triage &  KPIs Finalized",
+      "ws": "Triage",
+      "pic": "Ekta",
+      "date": "2026-05-01",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "HFE Feature in PMB",
+      "ws": "Product",
+      "pic": "Marcus Sjolin",
+      "date": "2026-04-24",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "HFE Test Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Ninad",
+      "date": "2026-04-27",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "HFE DAG/Config Updates",
+      "ws": "Product",
+      "pic": "Xiao Bo",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "HFE Digital Replay Testing Enablement",
+      "ws": "PMB",
+      "pic": "Amit",
+      "date": "2026-04-24",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "HFE AMO SILC  Triage &  KPIs Finalized",
+      "ws": "Triage",
+      "pic": "Ketaki",
+      "date": "2026-05-01",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "L2 Driving - L2p Planner FC - Feature in PMB",
+      "ws": "Product",
+      "pic": "Kyle",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "L2 Driving - L2p Planner  Test Plan Complete",
+      "ws": "\u2014",
+      "pic": "\u2014",
+      "date": "",
+      "statusText": "Complete",
+      "st": "complete",
+      "dependency": ""
+    },
+    {
+      "label": "L2 Driving - L2p Planner DAG/Config Updates",
+      "ws": "Product",
+      "pic": "\u2014",
+      "date": "",
+      "statusText": "",
+      "st": "unspecified",
+      "dependency": ""
+    },
+    {
+      "label": "L2 Driving - L2p Planner Digital Replay Testing Enablement",
+      "ws": "PMB",
+      "pic": "\u2014",
+      "date": "",
+      "statusText": "",
+      "st": "unspecified",
+      "dependency": ""
+    },
+    {
+      "label": "DCAS Feature in PMB",
+      "ws": "Product",
+      "pic": "Kaiyuan Wei",
+      "date": "2026-04-27",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "DCAS PMB Test Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Karthik P",
+      "date": "2026-04-27",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "DCAS DAG /Config Updates",
+      "ws": "Product",
+      "pic": "Xiao Bo",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "APA P2P On Street Feature in PMB",
+      "ws": "Product",
+      "pic": "Kevin Jin",
+      "date": "",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "APA P2P On Street Test Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Saiprasad",
+      "date": "",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "APA P2P On Street Digital Replay Testing Enablement",
+      "ws": "PMB",
+      "pic": "Amit",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "APA P2P On Street Triage & KPIs Finalized",
+      "ws": "InCar Testing",
+      "pic": "Saiprasad",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "Active Safety Feature in PMB",
+      "ws": "Product",
+      "pic": "Saiprasad",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "Active SafetyTest Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Saiprasad",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "ATCA Feature in PMB",
+      "ws": "Product",
+      "pic": "Wiley",
+      "date": "",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "ATCA Test Plan Complete",
+      "ws": "InCar Testing",
+      "pic": "Yuvika",
+      "date": "",
+      "statusText": "Not Started",
+      "st": "notstarted",
+      "dependency": ""
+    },
+    {
+      "label": "ATCA Triage & KPI Finalized",
+      "ws": "Triage",
+      "pic": "Anjali",
+      "date": "2026-05-01",
+      "statusText": "In Progress",
+      "st": "progress",
+      "dependency": ""
+    },
+    {
+      "label": "Branch Activation",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-15",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Config List",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-15",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Promotions Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-17",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "MTTF Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-18",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "DIFORV Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-18",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "CCB Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-19",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "AVBT Checklist",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-15",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Maintainer Support",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "QC Support",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Automatic PMB Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Alfred Setup",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "GVS Compute Allocation",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Main Freeze",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-20",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Branch Fast Forward",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-22",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "Daily Build Starts",
+      "ws": "PMB",
+      "pic": "Adam",
+      "date": "2026-05-23",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    },
+    {
+      "label": "PMB Cars Upgraded with R18.0.0 VIP",
+      "ws": "Car Prioritization/Diversity",
+      "pic": "Johnny",
+      "date": "2026-04-29",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": ""
+    }
+  ]
+}
