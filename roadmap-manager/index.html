@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roadmap Manager — I&amp;T E2E</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">Roadmap Manager</div>
+      <button type="button" class="nav-item is-active" data-view="dashboard">Dashboard</button>
+      <button type="button" class="nav-item" data-view="timeline">Timeline</button>
+      <button type="button" class="nav-item" data-view="milestones">Milestones</button>
+      <button type="button" class="nav-item" data-view="features">Features</button>
+      <button type="button" class="nav-item" data-view="workstreams">Workstreams</button>
+      <button type="button" class="nav-item" data-view="intake">Intake / Issues</button>
+      <div style="margin-top: 1.5rem; padding: 0 1rem">
+        <button type="button" class="btn btn-ghost" id="reset-demo" style="width: 100%; font-size: 0.78rem">Reset demo data</button>
+      </div>
+    </aside>
+    <main class="main">
+      <div id="main-content"></div>
+    </main>
+  </div>
+  <div id="modal-root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
