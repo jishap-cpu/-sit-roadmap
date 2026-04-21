@@ -1,24 +1,28 @@
 /**
  * SIT ROADMAP — loads Program Milestones from Google Sheets.
  *
- * TWO WAYS TO CONNECT (choose one):
+ * ── OPTION A: Google Sign-In / OAuth2 (recommended — sheet stays private) ──
+ *   1. oauthClientId → already filled from your project credentials
+ *   2. Sheet must be shared with your team's Google accounts (not public)
+ *   3. Users click "Sign in with Google" on the page — one-time per session
+ *   SETUP: In Google Cloud Console → APIs & Services → Credentials → your OAuth2 client
+ *          → Add "https://jishap-cpu.github.io" under Authorized JavaScript origins
  *
- * ── OPTION A: Google Sheets API (recommended — live JSON, no publish step) ──
- *   1. sheetsApiKey  → get a free API key at console.cloud.google.com
- *      (New project → Enable "Google Sheets API" → Credentials → API key)
- *   2. spreadsheetId → already set below from your sheet URL
- *   3. sheetGid      → already set below from your sheet URL
- *   4. Sheet must be shared: "Anyone with the link → Viewer"
+ * ── OPTION B: Google Sheets API key (sheet must be public) ──
+ *   1. sheetsApiKey  → get from console.cloud.google.com → Credentials → API key
+ *   2. Sheet must be shared: "Anyone with the link → Viewer"
  *
- * ── OPTION B: CSV export (no API key needed) ──
- *   1. Sheet must be shared: "Anyone with the link → Viewer"
- *   2. Set csvExportUrl below, OR leave spreadsheetId + sheetGid (auto-builds URL)
- *   Optional: append ?csv=<encodeURIComponent(url)> to the page URL to override.
+ * ── OPTION C: CSV export (no API key, sheet must be public) ──
+ *   Set csvExportUrl below, OR leave spreadsheetId + sheetGid (auto-builds URL)
  */
 (function () {
   window.SIT_ROADMAP_CONFIG = {
-    // ── OPTION A: Sheets API ──────────────────────────────────────────────────
-    /** Paste your Google Sheets API key here (free, from console.cloud.google.com) */
+    // ── OPTION A: OAuth2 Sign-In (recommended — keeps sheet private) ──────────
+    /** OAuth2 client ID from Google Cloud Console → Credentials */
+    oauthClientId: "209434048344-rf3sepodgeg02bqapt1586gl620utqfi.apps.googleusercontent.com",
+
+    // ── OPTION B: Sheets API key (public sheet only) ──────────────────────────
+    /** Paste your Google Sheets API key here if not using OAuth2 */
     sheetsApiKey: "",
 
     /** Your spreadsheet ID — already filled from your sheet URL */
@@ -27,7 +31,7 @@
     /** The tab's GID — already filled from your sheet URL */
     sheetGid: "539542201",
 
-    // ── OPTION B: CSV export (used as fallback if sheetsApiKey is empty) ─────
+    // ── OPTION C: CSV export (fallback — public sheet only) ───────────────────
     /** Full CSV export URL — leave empty to auto-build from spreadsheetId + sheetGid */
     csvExportUrl: "",
 
@@ -875,13 +879,132 @@
   }
 
   /**
-   * OPTION A — Google Sheets API v4 (JSON).
+   * OPTION A — OAuth2 token-based Sheets API access.
+   * Uses Google Identity Services token model. Sheet stays private.
+   * Requires oauthClientId and https://jishap-cpu.github.io added as
+   * an Authorized JavaScript Origin in Google Cloud Console.
+   */
+  var _oauthToken = null;
+
+  function loadFromOAuth(spreadsheetId, sheetGid, clientId) {
+    return new Promise(function (resolve) {
+      // If already have a token, use it directly
+      if (_oauthToken) {
+        resolve(fetchSheetsWithToken(_oauthToken, spreadsheetId, sheetGid));
+        return;
+      }
+
+      // Show sign-in UI and request a token
+      showSignInButton(clientId, spreadsheetId, sheetGid, resolve);
+    });
+  }
+
+  function showSignInButton(clientId, spreadsheetId, sheetGid, resolve) {
+    var banner = document.getElementById("roadmap-banner");
+
+    // Create sign-in overlay if not already there
+    var existing = document.getElementById("gsi-signin-bar");
+    if (existing) existing.remove();
+
+    var bar = document.createElement("div");
+    bar.id = "gsi-signin-bar";
+    bar.style.cssText = [
+      "position:fixed", "top:0", "left:0", "right:0", "z-index:9999",
+      "background:#1a73e8", "color:#fff", "padding:12px 20px",
+      "display:flex", "align-items:center", "gap:14px",
+      "font-family:sans-serif", "font-size:14px", "box-shadow:0 2px 8px rgba(0,0,0,.3)"
+    ].join(";");
+    bar.innerHTML =
+      '<span style="flex:1">Sign in with your Google account to load live roadmap data from the sheet.</span>' +
+      '<button id="gsi-signin-btn" style="background:#fff;color:#1a73e8;border:none;' +
+      'border-radius:4px;padding:8px 18px;font-weight:600;cursor:pointer;font-size:14px">' +
+      'Sign in with Google</button>' +
+      '<button id="gsi-skip-btn" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);' +
+      'border-radius:4px;padding:8px 14px;cursor:pointer;font-size:13px">Use snapshot</button>';
+
+    document.body.insertBefore(bar, document.body.firstChild);
+    document.body.style.paddingTop = "54px";
+
+    document.getElementById("gsi-signin-btn").addEventListener("click", function () {
+      setBanner("Connecting to Google…", false);
+      var client = window.google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+        callback: function (resp) {
+          if (resp.error) {
+            useFallback("Google sign-in cancelled or failed. Showing embedded snapshot.");
+            bar.remove();
+            document.body.style.paddingTop = "";
+            resolve();
+            return;
+          }
+          _oauthToken = resp.access_token;
+          bar.remove();
+          document.body.style.paddingTop = "";
+          resolve(fetchSheetsWithToken(_oauthToken, spreadsheetId, sheetGid));
+        }
+      });
+      client.requestAccessToken({ prompt: "select_account" });
+    });
+
+    document.getElementById("gsi-skip-btn").addEventListener("click", function () {
+      bar.remove();
+      document.body.style.paddingTop = "";
+      useFallback("Using embedded snapshot — click 'Sign in with Google' to load live data.");
+      resolve();
+    });
+
+    setBanner("Sign in with Google (blue bar above) to load live sheet data, or use snapshot.", false);
+  }
+
+  function fetchSheetsWithToken(token, spreadsheetId, sheetGid) {
+    var BASE = "https://sheets.googleapis.com/v4/spreadsheets/";
+    setBanner("Loading roadmap from Google Sheet…", false);
+
+    return fetch(
+      BASE + spreadsheetId + "?fields=sheets.properties",
+      { headers: { "Authorization": "Bearer " + token } }
+    )
+      .then(function (res) {
+        if (!res.ok) throw new Error("Sheets API HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (meta) {
+        var sheets = meta.sheets || [];
+        var sheetName = null;
+        var gidNum = String(sheetGid);
+        for (var i = 0; i < sheets.length; i++) {
+          var p = sheets[i].properties || {};
+          if (String(p.sheetId) === gidNum) { sheetName = p.title; break; }
+        }
+        if (!sheetName) sheetName = sheets.length ? (sheets[0].properties || {}).title : "Sheet1";
+        return fetch(
+          BASE + spreadsheetId + "/values/" + encodeURIComponent(sheetName) +
+          "?valueRenderOption=FORMATTED_VALUE",
+          { headers: { "Authorization": "Bearer " + token } }
+        );
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Sheets values HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (body) {
+        var rows = body.values || [];
+        if (!rows.length) throw new Error("Sheet returned empty data.");
+        var parsed = parseProgramMilestonesRows(rows);
+        if (!parsed.l1.length && !parsed.l2.length)
+          throw new Error("No L1/L2 rows found — verify Level, Milestones, Workstream, Status, ETC columns exist.");
+        applyParsed(parsed, "Google Sheet (live)");
+      })
+      .catch(function (err) {
+        useFallback("Sheet error: " + (err && err.message ? err.message : "unknown") +
+          ". Showing embedded snapshot.");
+      });
+  }
+
+  /**
+   * OPTION B — Google Sheets API v4 (JSON) with API key.
    * Requires a free API key and the sheet shared as "Anyone with link → Viewer".
-   * Steps to get an API key:
-   *   1. Go to https://console.cloud.google.com
-   *   2. Create a project → APIs & Services → Enable "Google Sheets API"
-   *   3. Credentials → Create credentials → API key
-   *   4. Paste the key into sheetsApiKey in SIT_ROADMAP_CONFIG above.
    */
   function loadFromSheetsAPI(spreadsheetId, sheetGid, apiKey) {
     var BASE = "https://sheets.googleapis.com/v4/spreadsheets/";
@@ -968,16 +1091,42 @@
     var cfg = window.SIT_ROADMAP_CONFIG || {};
     applyOpenSheetLink();
 
+    var clientId = (cfg.oauthClientId || "").trim();
     var apiKey = (cfg.sheetsApiKey || "").trim();
     var spreadsheetId = (cfg.spreadsheetId || "").trim();
     var sheetGid = String(cfg.sheetGid != null ? cfg.sheetGid : "0").trim();
 
-    // OPTION A — Sheets API
+    // OPTION A — OAuth2 Sign-In (sheet stays private)
+    if (clientId && spreadsheetId) {
+      // Wait for Google Identity Services library to load
+      if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+        return loadFromOAuth(spreadsheetId, sheetGid, clientId);
+      }
+      // GIS not yet loaded — wait up to 5s then try
+      var waited = 0;
+      var poll = setInterval(function () {
+        waited += 200;
+        if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+          clearInterval(poll);
+          loadFromOAuth(spreadsheetId, sheetGid, clientId);
+        } else if (waited >= 5000) {
+          clearInterval(poll);
+          // GIS failed to load — fall through to API key or CSV
+          if (apiKey && spreadsheetId) return loadFromSheetsAPI(spreadsheetId, sheetGid, apiKey);
+          var csvUrl = buildCsvUrl();
+          if (csvUrl) return loadFromCsv(csvUrl);
+          useFallback("Google Identity Services failed to load. Showing embedded snapshot.");
+        }
+      }, 200);
+      return;
+    }
+
+    // OPTION B — Sheets API key
     if (apiKey && spreadsheetId) {
       return loadFromSheetsAPI(spreadsheetId, sheetGid, apiKey);
     }
 
-    // OPTION B — CSV
+    // OPTION C — CSV
     var csvUrl = buildCsvUrl();
     if (csvUrl) {
       return loadFromCsv(csvUrl);
