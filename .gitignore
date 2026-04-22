@@ -4,3 +4,4 @@ Archive/
 Archive.zip
 .venv/
 *.pickle
+EOD-report-*.md
