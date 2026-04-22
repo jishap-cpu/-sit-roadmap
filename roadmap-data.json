@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-22T19:57:22Z",
+  "generated": "2026-04-22T20:59:50Z",
   "l1": [
     {
       "label": "Product Feature Completion",
@@ -16,15 +16,15 @@
       "label": "R18.0.0 VIP",
       "ws": "Sys Int",
       "pic": "Todd",
-      "date": "2026-04-24",
+      "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
       "level": "L1",
-      "etcDelta": 0
+      "etcDelta": 3
     },
     {
-      "label": "R18.1.0 VIP",
+      "label": "R18.1.0+ VIP",
       "ws": "Sys Int",
       "pic": "Todd",
       "date": "",
@@ -72,8 +72,8 @@
       "ws": "Car Prioritization/Diversity",
       "pic": "Toan",
       "date": "",
-      "statusText": "In Progress",
-      "st": "progress",
+      "statusText": "Blocked",
+      "st": "blocked",
       "dependency": "R18.0.0 VIP Approval",
       "level": "L1",
       "etcDelta": null
@@ -159,7 +159,7 @@
       "label": "EU PMB/Scaling / Diversity Test Plan Strategy",
       "ws": "InCar Testing",
       "pic": "Bruce",
-      "date": "",
+      "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
@@ -170,7 +170,7 @@
       "label": "EU PMB/Scaling / Diversity Test Execution Plan",
       "ws": "InCar Testing",
       "pic": "Bruce",
-      "date": "",
+      "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
@@ -307,7 +307,7 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "",
+      "dependency": "Highway AMO SILC PMB Test Plan Complete",
       "level": "L2",
       "etcDelta": 0
     },
@@ -351,7 +351,7 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "",
+      "dependency": "HFE Test Plan Complete",
       "level": "L2",
       "etcDelta": 0
     },
@@ -391,8 +391,8 @@
     {
       "label": "L2 Driving - L2p Planner Triage & KPIs Finalized",
       "ws": "Triage",
-      "pic": "Jason",
-      "date": "",
+      "pic": "Anshula",
+      "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
@@ -415,8 +415,8 @@
       "ws": "InCar Testing",
       "pic": "Renmin",
       "date": "",
-      "statusText": "In Progress",
-      "st": "progress",
+      "statusText": "Complete",
+      "st": "complete",
       "dependency": "",
       "level": "L2",
       "etcDelta": null
@@ -436,7 +436,7 @@
       "label": "L2PP Urban - Triage & KPIs Finalized",
       "ws": "Triage",
       "pic": "Jason",
-      "date": "",
+      "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
@@ -571,7 +571,7 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "",
+      "dependency": "ATCA Test Plan Complete",
       "level": "L2",
       "etcDelta": 0
     },
@@ -800,9 +800,9 @@
       "ws": "Car Prioritization/Diversity",
       "pic": "Johnny",
       "date": "2026-04-29",
-      "statusText": "Not Started",
-      "st": "notstarted",
-      "dependency": "",
+      "statusText": "Blocked",
+      "st": "blocked",
+      "dependency": "R18.0.0 VIP Approval",
       "level": "L2",
       "etcDelta": 0
     }
