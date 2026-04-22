@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-22T19:43:23Z",
+  "generated": "2026-04-22T19:57:22Z",
   "l1": [
     {
       "label": "Product Feature Completion",
@@ -8,7 +8,9 @@
       "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "R18.0.0 VIP",
@@ -17,7 +19,9 @@
       "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "R18.1.0 VIP",
@@ -26,7 +30,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "R18 x.x.x VIP",
@@ -35,7 +41,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "LKG Pre RC VIP",
@@ -44,7 +52,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "Zero Rel Blockers",
@@ -53,7 +63,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "Complete Fleet Transition to R18.0.0  VIP",
@@ -62,7 +74,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "R18.0.0 VIP Approval"
+      "dependency": "R18.0.0 VIP Approval",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "L2PP Sweeping CA",
@@ -71,7 +85,9 @@
       "date": "2026-04-26",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "L2PP Sweeping TX",
@@ -80,7 +96,9 @@
       "date": "2026-06-07",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "L2PP Sweeping NJ",
@@ -89,7 +107,9 @@
       "date": "2026-07-12",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "Sweeping - VnV Testing Completion",
@@ -98,7 +118,9 @@
       "date": "2026-07-12",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "USA PMB/Scaling / Diversity Test Plan Strategy",
@@ -107,7 +129,9 @@
       "date": "2026-04-22",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "USA PMB/Scaling / Diversity Test Execution Plan",
@@ -116,7 +140,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "USA Scaling PMB - Diversity Testing Start",
@@ -125,7 +151,9 @@
       "date": "2026-04-27",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": "-R18.0.0 VIP Approval\n-PMB/Scaling / Diversity Test Plan Strategy\n-PMB/Scaling / Diversity Test Execution Plan \n-Triage & KPI Plan Completion"
+      "dependency": "-R18.0.0 VIP Approval\n-PMB/Scaling / Diversity Test Plan Strategy\n-PMB/Scaling / Diversity Test Execution Plan \n-Triage & KPI Plan Completion",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "EU PMB/Scaling / Diversity Test Plan Strategy",
@@ -134,7 +162,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "EU PMB/Scaling / Diversity Test Execution Plan",
@@ -143,7 +173,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L1",
+      "etcDelta": null
     },
     {
       "label": "EU Scaling PMB - Diversity Testing Start",
@@ -152,7 +184,9 @@
       "date": "2026-04-27",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": "R18.0.0 VIP Approval\n-PMB/Scaling / Diversity Test Plan Strategy\n-PMB/Scaling / Diversity Test Execution Plan\n-Triage & KPI Plan Completion"
+      "dependency": "R18.0.0 VIP Approval\n-PMB/Scaling / Diversity Test Plan Strategy\n-PMB/Scaling / Diversity Test Execution Plan\n-Triage & KPI Plan Completion",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "Triage & KPI Plan Completion",
@@ -161,7 +195,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "-PMB/Scaling / Diversity Test Execution Plan"
+      "dependency": "-PMB/Scaling / Diversity Test Execution Plan",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "R18 PMB Branch Off & Process",
@@ -170,7 +206,9 @@
       "date": "2026-05-22",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "Product Feature Completion"
+      "dependency": "Product Feature Completion",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "Integration Complete",
@@ -179,7 +217,9 @@
       "date": "2026-05-25",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "R18 PMB Branch Off"
+      "dependency": "R18 PMB Branch Off",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "SW Pre-Freeze",
@@ -188,7 +228,9 @@
       "date": "2026-06-08",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "Integration Complete"
+      "dependency": "Integration Complete",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "SW Freeze / Harlock",
@@ -197,7 +239,9 @@
       "date": "2026-06-19",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "SW Pre-Freeze"
+      "dependency": "SW Pre-Freeze",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "SW Freeze Mgmt Review",
@@ -206,7 +250,9 @@
       "date": "2026-06-24",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "SW Freeze / Harlock"
+      "dependency": "SW Freeze / Harlock",
+      "level": "L1",
+      "etcDelta": 0
     },
     {
       "label": "RPD",
@@ -215,7 +261,9 @@
       "date": "2026-07-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": "SW Freeze Mgmt Review"
+      "dependency": "SW Freeze Mgmt Review",
+      "level": "L1",
+      "etcDelta": 0
     }
   ],
   "l2": [
@@ -226,7 +274,9 @@
       "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Highway AMO SILC PMB Test Plan Complete",
@@ -235,7 +285,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": "R18.0.0 VIP Approval"
+      "dependency": "R18.0.0 VIP Approval",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Highway AMO SILC Digital Replay Testing Enablement",
@@ -244,7 +296,9 @@
       "date": "2026-04-24",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Highway AMO SILC  Triage &  KPIs Finalized",
@@ -253,7 +307,9 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "HFE Feature in PMB",
@@ -262,7 +318,9 @@
       "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "HFE Test Plan Complete",
@@ -271,7 +329,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "HFE Digital Replay Testing Enablement",
@@ -280,7 +340,9 @@
       "date": "2026-05-01",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "HFE AMO SILC  Triage &  KPIs Finalized",
@@ -289,7 +351,9 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "L2 Driving - L2p Planner FC - Feature in PMB",
@@ -298,7 +362,9 @@
       "date": "2026-04-24",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "L2 Driving - L2p Planner  Test Plan Complete",
@@ -307,7 +373,9 @@
       "date": "",
       "statusText": "Complete",
       "st": "complete",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2 Driving - L2p Planner Digital Replay Testing Enablement",
@@ -316,7 +384,9 @@
       "date": "",
       "statusText": "Complete",
       "st": "complete",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2 Driving - L2p Planner Triage & KPIs Finalized",
@@ -325,7 +395,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2PP Urban - Feature in PMB",
@@ -334,7 +406,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2PP Urban - Test Plan Complete",
@@ -343,7 +417,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2PP Urban - Digital Replay Testing Enablement",
@@ -352,7 +428,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "L2PP Urban - Triage & KPIs Finalized",
@@ -361,7 +439,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "DCAS Feature in PMB",
@@ -370,7 +450,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "DCAS PMB Test Plan Complete",
@@ -379,7 +461,9 @@
       "date": "2026-04-27",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "APA P2P On Street Feature in PMB",
@@ -388,7 +472,9 @@
       "date": "",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "APA P2P On Street Test Plan Complete",
@@ -397,7 +483,9 @@
       "date": "",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "APA P2P On Street Digital Replay Testing Enablement",
@@ -406,7 +494,9 @@
       "date": "2026-05-01",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "APA P2P On Street Triage & KPIs Finalized",
@@ -415,7 +505,9 @@
       "date": "",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "Active Safety Feature in PMB",
@@ -424,7 +516,9 @@
       "date": "",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "Active SafetyTest Plan Complete",
@@ -433,7 +527,9 @@
       "date": "",
       "statusText": "Blocked",
       "st": "blocked",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "Active Safety Triage & KPIs Finalized",
@@ -442,7 +538,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "ATCA Feature in PMB",
@@ -451,7 +549,9 @@
       "date": "",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "ATCA Test Plan Complete",
@@ -460,7 +560,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "ATCA Triage & KPI Finalized",
@@ -469,7 +571,9 @@
       "date": "2026-05-01",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "ATCA Digital Replay Testing Enablement",
@@ -478,7 +582,9 @@
       "date": "",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "Branch Activation",
@@ -487,7 +593,9 @@
       "date": "2026-05-15",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Config List",
@@ -496,7 +604,9 @@
       "date": "2026-05-15",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Promotions Setup",
@@ -505,7 +615,9 @@
       "date": "2026-05-17",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "MTTF Setup",
@@ -514,7 +626,9 @@
       "date": "2026-05-18",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "DIFORV Setup",
@@ -523,7 +637,9 @@
       "date": "2026-05-18",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "CCB Setup",
@@ -532,7 +648,9 @@
       "date": "2026-05-19",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "AVBT Checklist",
@@ -541,7 +659,9 @@
       "date": "2026-05-15",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Maintainer Support",
@@ -550,7 +670,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "QC Support",
@@ -559,7 +681,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Automatic PMB Setup",
@@ -568,7 +692,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Alfred Setup",
@@ -577,7 +703,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "GVS Compute Allocation",
@@ -586,7 +714,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Main Freeze",
@@ -595,7 +725,9 @@
       "date": "2026-05-20",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Branch Fast Forward",
@@ -604,7 +736,9 @@
       "date": "2026-05-22",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "Daily Build Starts",
@@ -613,7 +747,9 @@
       "date": "2026-05-23",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "VIP R18.0.0 SIT VIP acceptance",
@@ -622,7 +758,9 @@
       "date": "",
       "statusText": "Complete",
       "st": "complete",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "VIP R18.0.0 PMB Shadow Mode Acceptance",
@@ -631,7 +769,9 @@
       "date": "2026-04-23",
       "statusText": "In Progress",
       "st": "progress",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "VIP R18.0.0 Exec car upgrade",
@@ -640,7 +780,9 @@
       "date": "",
       "statusText": "Not Applicable",
       "st": "unspecified",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "VIP R18.0.0 Mini CCB",
@@ -649,7 +791,9 @@
       "date": "2026-04-24",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     },
     {
       "label": "PMB Cars Upgraded with R18.0.0 VIP",
@@ -658,7 +802,9 @@
       "date": "2026-04-29",
       "statusText": "Not Started",
       "st": "notstarted",
-      "dependency": ""
+      "dependency": "",
+      "level": "L2",
+      "etcDelta": 0
     }
   ]
 }

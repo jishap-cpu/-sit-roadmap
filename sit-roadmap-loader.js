@@ -354,9 +354,24 @@
       var depCell = dep
         ? '<td class="dep-cell"><span class="dep-tag">' + escapeHtml(dep) + "</span></td>"
         : '<td class="dep-cell" style="color:var(--muted,#8b95a8);font-size:0.82rem">—</td>';
+
+      // ETA delta badge (etcDelta is integer days set by fetch-roadmap-data.py)
+      var deltaBadge = "";
+      if (m.etcDelta != null && m.etcDelta !== 0) {
+        var d = m.etcDelta;
+        var slipped = d > 0;
+        var abs = Math.abs(d);
+        var label = slipped ? ("+" + abs + "d") : ("-" + abs + "d");
+        var title = slipped
+          ? ("Slipped " + abs + " day" + (abs === 1 ? "" : "s") + " since last update")
+          : ("Improved " + abs + " day" + (abs === 1 ? "" : "s") + " since last update");
+        deltaBadge = ' <span class="eta-delta ' + (slipped ? "eta-slipped" : "eta-improved") +
+          '" title="' + title + '">' + label + "</span>";
+      }
+
       return (
         '<tr data-ws="' + escapeHtml(m.ws || "") + '" data-label="' + escapeHtml(m.label) + '"><td>' +
-        escapeHtml(etc) +
+        escapeHtml(etc) + deltaBadge +
         "</td><td>" +
         escapeHtml(m.label) +
         '</td><td><span class="ws-tag">' +

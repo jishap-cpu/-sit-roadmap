@@ -311,6 +311,55 @@
     }
     .dep-cell { max-width: 240px; }
 
+    /* ETA delta badges */
+    .eta-delta {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      padding: 0.1rem 0.38rem; border-radius: 4px; margin-left: 5px;
+      vertical-align: middle; cursor: default;
+    }
+    .eta-slipped  { background: rgba(248,113,113,0.18); color: #fca5a5; border: 1px solid rgba(248,113,113,0.3); }
+    .eta-improved { background: rgba(52,211,153,0.18);  color: #6ee7b7; border: 1px solid rgba(52,211,153,0.3); }
+
+    /* ETA History panel */
+    .eta-history-panel {
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+      background: var(--surface); margin-bottom: 1.5rem; overflow: hidden;
+    }
+    .eta-history-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: var(--surface-2);
+    }
+    .eta-history-title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .eta-history-count {
+      font-size: 0.78rem; padding: 0.15rem 0.55rem; border-radius: 20px;
+      background: rgba(94,234,212,0.12); color: var(--accent);
+    }
+    .eta-history-toggle {
+      margin-left: auto; font-size: 0.78rem; padding: 0.25rem 0.75rem;
+      border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .eta-history-toggle:hover { background: rgba(255,255,255,0.06); }
+    .eta-history-body { padding: 1rem 1.25rem; max-height: 360px; overflow-y: auto; }
+    .eta-history-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .eta-entry {
+      display: grid; grid-template-columns: 140px 1fr auto auto;
+      align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem;
+      border-radius: 8px; background: var(--surface-2);
+      font-size: 0.83rem; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .eta-entry-date { color: var(--muted); font-size: 0.75rem; }
+    .eta-entry-label { font-weight: 600; color: var(--text); }
+    .eta-entry-change { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); }
+    .eta-entry-change .arr { color: var(--muted); }
+    .eta-entry-delta { font-weight: 700; font-size: 0.8rem; text-align: right; }
+    .eta-entry.slipped  { border-left: 3px solid rgba(248,113,113,0.5); }
+    .eta-entry.improved { border-left: 3px solid rgba(52,211,153,0.5); }
+    .eta-entry.new-ms   { border-left: 3px solid rgba(94,234,212,0.5); }
+    .eta-entry.status-only { border-left: 3px solid rgba(148,163,184,0.3); }
+    .eta-history-empty  { color: var(--muted); font-size: 0.88rem; padding: 0.5rem 0; }
+
     .status {
       display: inline-flex; align-items: center; gap: 0.35rem;
       font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.55rem;
@@ -615,6 +664,18 @@
          TAB 3 — R18 MILESTONES
     ════════════════════════════════════════ -->
     <div id="tab-milestones" class="tab-panel">
+
+      <!-- ETA History panel -->
+      <div id="eta-history-panel" class="eta-history-panel" style="display:none">
+        <div class="eta-history-header">
+          <span class="eta-history-title">ETA Change History</span>
+          <span id="eta-history-count" class="eta-history-count"></span>
+          <button id="eta-history-toggle" class="eta-history-toggle" onclick="toggleHistoryPanel()">Hide</button>
+        </div>
+        <div id="eta-history-body" class="eta-history-body">
+          <div id="eta-history-list" class="eta-history-list">Loading…</div>
+        </div>
+      </div>
 
       <!-- Filter bar (shown when coming from workstream/feature link) -->
       <div id="ms-filter-bar" class="ms-filter-bar"></div>
@@ -1237,6 +1298,101 @@
       tagRows();
       if (activeMsFilter) applyMsFilter();
     });
+
+    /* ── ETA History panel ── */
+    function toggleHistoryPanel() {
+      var body = document.getElementById("eta-history-body");
+      var btn  = document.getElementById("eta-history-toggle");
+      if (!body || !btn) return;
+      var hidden = body.style.display === "none";
+      body.style.display = hidden ? "" : "none";
+      btn.textContent    = hidden ? "Hide" : "Show";
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      try {
+        var d = new Date(iso);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      } catch(e) { return iso; }
+    }
+
+    function fmtChangedAt(iso) {
+      if (!iso) return "";
+      try {
+        var d = new Date(iso);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
+               " " + d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      } catch(e) { return iso; }
+    }
+
+    function renderHistoryPanel(changes) {
+      var panel = document.getElementById("eta-history-panel");
+      var list  = document.getElementById("eta-history-list");
+      var count = document.getElementById("eta-history-count");
+      if (!panel || !list) return;
+
+      panel.style.display = "";
+      if (!changes || !changes.length) {
+        list.innerHTML = '<div class="eta-history-empty">No ETA changes recorded yet. Changes will appear here after the next data refresh detects a difference.</div>';
+        if (count) count.textContent = "0 changes";
+        return;
+      }
+
+      if (count) count.textContent = changes.length + " change" + (changes.length !== 1 ? "s" : "");
+
+      list.innerHTML = changes.map(function(c) {
+        var cls = "eta-entry";
+        var deltaHtml = "";
+        var changeHtml = "";
+
+        if (c.change_type === "eta_change") {
+          var d = c.delta_days;
+          var slipped = d != null && d > 0;
+          var improved = d != null && d < 0;
+          cls += slipped ? " slipped" : (improved ? " improved" : "");
+          deltaHtml = d != null
+            ? '<span class="eta-entry-delta ' + (slipped ? "eta-slipped" : "eta-improved") + '">' +
+              (slipped ? "+" : "") + d + "d</span>"
+            : "";
+          changeHtml = '<span class="eta-entry-change">' +
+            '<span>' + esc(fmtDate(c.old_date) || "—") + '</span>' +
+            '<span class="arr">→</span>' +
+            '<span>' + esc(fmtDate(c.new_date) || "—") + '</span>' +
+            '</span>';
+        } else if (c.change_type === "status_change") {
+          cls += " status-only";
+          changeHtml = '<span class="eta-entry-change">' +
+            '<span>' + esc(c.old_status || "—") + '</span>' +
+            '<span class="arr">→</span>' +
+            '<span>' + esc(c.new_status || "—") + '</span>' +
+            '</span>';
+          deltaHtml = '<span style="font-size:0.75rem;color:var(--muted)">status</span>';
+        } else if (c.change_type === "new_milestone") {
+          cls += " new-ms";
+          changeHtml = '<span class="eta-entry-change">New · ETC ' + esc(fmtDate(c.new_date) || "TBD") + '</span>';
+          deltaHtml = '<span style="font-size:0.75rem;color:var(--accent)">new</span>';
+        }
+
+        return '<div class="' + cls + '">' +
+          '<span class="eta-entry-date">' + esc(fmtChangedAt(c.changed_at)) + '</span>' +
+          '<span class="eta-entry-label">[' + esc(c.level || "") + '] ' + esc(c.label) + '</span>' +
+          changeHtml +
+          deltaHtml +
+          '</div>';
+      }).join("");
+    }
+
+    function loadEtaHistory() {
+      fetch("roadmap-history.json?_=" + Date.now(), { cache: "no-store" })
+        .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function(data) { renderHistoryPanel(data.changes || []); })
+        .catch(function() {
+          // History file not yet generated — hide panel silently
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadEtaHistory);
 
   })();
   </script>
