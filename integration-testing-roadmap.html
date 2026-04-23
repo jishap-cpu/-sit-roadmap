@@ -641,6 +641,43 @@
       <section>
         <h2>Workstreams</h2>
         <p class="lead">All L1 and L2 milestones grouped by delivery workstream. Blocked counts and the status bar give instant health at a glance. Click <strong>"View all in Milestones →"</strong> to filter the Milestones view to that workstream — workstream tags in the milestone table link back here.</p>
+
+        <!-- ── Gantt Chart ── -->
+        <div id="gantt-ws-wrapper" style="display:none;margin-bottom:2rem">
+          <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;flex-wrap:wrap">
+            <h3 style="margin:0;font-size:1rem">Gantt — R18 Workstreams</h3>
+            <div style="display:flex;gap:0.6rem;align-items:center;margin-left:auto;flex-wrap:wrap">
+              <label style="font-size:0.82rem;color:var(--muted)">Level:
+                <select id="gantt-ws-level" style="margin-left:4px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:0.82rem">
+                  <option value="all">L1 + L2</option>
+                  <option value="l1">L1 only</option>
+                  <option value="l2">L2 only</option>
+                </select>
+              </label>
+              <label style="font-size:0.82rem;color:var(--muted)">Color:
+                <select id="gantt-ws-color" style="margin-left:4px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:0.82rem">
+                  <option value="status">By Status</option>
+                  <option value="workstream">By Workstream</option>
+                </select>
+              </label>
+              <label style="font-size:0.82rem;color:var(--muted)">
+                <input type="checkbox" id="gantt-ws-deps" checked style="margin-right:4px">Show dependencies
+              </label>
+            </div>
+          </div>
+          <div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+            <svg id="gantt-ws-svg" style="display:block;min-width:700px"></svg>
+          </div>
+          <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.6rem;font-size:0.76rem;color:var(--muted)">
+            <span><span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:2px;margin-right:4px;vertical-align:middle"></span>In Progress</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#ef4444;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Blocked</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#10b981;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Complete</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#64748b;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Not Started</span>
+            <span><span style="display:inline-block;width:32px;height:2px;background:#f59e0b;vertical-align:middle;margin-right:4px"></span>Dependency</span>
+            <span><span style="display:inline-block;width:2px;height:12px;background:#f87171;vertical-align:middle;margin-right:4px"></span>Today</span>
+          </div>
+        </div>
+
         <div id="ws-panel-content" style="color:var(--muted);font-size:0.95rem">
           Loading workstream data…
         </div>
@@ -973,6 +1010,9 @@
         setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 80);
         applyMsFilter();
       }
+      if (name === "workstreams" && _ganttL1.length) {
+        setTimeout(function () { renderWsGantt(_ganttL1, _ganttL2); }, 80);
+      }
     }
 
     /* ── Milestone filter ── */
@@ -1293,10 +1333,273 @@
       var d = (e && e.detail) || {};
       var l1 = d.l1 || [];
       var l2 = d.l2 || [];
+      _ganttL1 = l1;
+      _ganttL2 = l2;
       renderWorkstreams(l1, l2);
       renderFeatures(l2);
       tagRows();
       if (activeMsFilter) applyMsFilter();
+      // Small delay so SVG has rendered width before Gantt reads it
+      setTimeout(function(){ renderWsGantt(l1, l2); }, 150);
+    });
+
+    /* ── Gantt Chart — Workstreams tab ── */
+
+    var _ganttL1 = [], _ganttL2 = [];
+
+    var WS_COLORS = [
+      "#6366f1","#0ea5e9","#10b981","#f59e0b","#ec4899",
+      "#8b5cf6","#14b8a6","#f97316","#06b6d4","#84cc16"
+    ];
+
+    function statusFill(st) {
+      return { blocked:"#ef4444", progress:"#3b82f6", complete:"#10b981",
+               notstarted:"#475569", unspecified:"#64748b" }[st] || "#64748b";
+    }
+
+    function parseDeps(depStr) {
+      if (!depStr) return [];
+      return depStr.split(/[\n\r]/).map(function(s){ return s.replace(/^[-\s]+/,"").trim(); }).filter(Boolean);
+    }
+
+    function fuzzyFindMilestone(name, items) {
+      var n = name.toLowerCase().trim();
+      if (!n) return null;
+      // exact
+      for (var i = 0; i < items.length; i++) { if (items[i].label.toLowerCase().trim() === n) return items[i]; }
+      // label contains depName
+      for (var i = 0; i < items.length; i++) { if (items[i].label.toLowerCase().indexOf(n) >= 0) return items[i]; }
+      // depName contains label
+      for (var i = 0; i < items.length; i++) { if (n.indexOf(items[i].label.toLowerCase().trim()) >= 0) return items[i]; }
+      // first word match (e.g. "R18.0.0 VIP Approval" → "R18.0.0 VIP")
+      var words = n.split(" ").slice(0, 3).join(" ");
+      for (var i = 0; i < items.length; i++) { if (items[i].label.toLowerCase().indexOf(words) >= 0) return items[i]; }
+      return null;
+    }
+
+    function renderWsGantt(l1, l2) {
+      var levelSel = document.getElementById("gantt-ws-level");
+      var colorSel = document.getElementById("gantt-ws-color");
+      var depChk   = document.getElementById("gantt-ws-deps");
+      var level    = levelSel ? levelSel.value : "all";
+      var colorMode= colorSel ? colorSel.value : "status";
+      var showDeps = depChk   ? depChk.checked  : true;
+
+      var items = [];
+      if (level !== "l2") l1.forEach(function(m){ items.push(Object.assign({},m,{_level:"L1"})); });
+      if (level !== "l1") l2.forEach(function(m){ items.push(Object.assign({},m,{_level:"L2"})); });
+
+      // Filter to those with at least an ETC date
+      var dated = items.filter(function(m){ return m.date || m.startDate; });
+      if (!dated.length) return;
+
+      // ── Time range ──
+      var today = new Date(); today.setHours(12,0,0,0);
+      var allDates = [];
+      dated.forEach(function(m){
+        if (m.date)      allDates.push(new Date(m.date+"T12:00:00"));
+        if (m.startDate) allDates.push(new Date(m.startDate+"T12:00:00"));
+      });
+      var minD = new Date(Math.min.apply(null, allDates));
+      var maxD = new Date(Math.max.apply(null, allDates));
+      minD.setDate(minD.getDate() - 7);
+      maxD.setDate(maxD.getDate() + 14);
+
+      var totalMs = maxD - minD;
+      function xPct(d) { return Math.max(0, Math.min(100, (d - minD) / totalMs * 100)); }
+
+      // ── Layout constants ──
+      var LABEL_W = 210;
+      var ROW_H   = 30;
+      var GRP_H   = 34;
+      var PAD_TOP = 42;  // header height
+      var PAD_BOT = 20;
+      var DOT_R   = 5;
+
+      // ── Group by workstream ──
+      var groups = {};
+      var groupOrder = [];
+      dated.forEach(function(m){
+        var ws = m.ws || "—";
+        if (!groups[ws]) { groups[ws] = []; groupOrder.push(ws); }
+        groups[ws].push(m);
+      });
+      // sort each group by ETC
+      groupOrder.forEach(function(ws){
+        groups[ws].sort(function(a,b){
+          var ad = a.date ? new Date(a.date) : new Date("2099-01-01");
+          var bd = b.date ? new Date(b.date) : new Date("2099-01-01");
+          return ad - bd;
+        });
+      });
+
+      // ── Calculate total SVG height and row positions ──
+      var rowMap = {};   // label → {y, m}  (center Y of the bar)
+      var y = PAD_TOP;
+      groupOrder.forEach(function(ws){
+        y += GRP_H;
+        groups[ws].forEach(function(m){
+          rowMap[m.label] = { y: y + ROW_H/2, m: m };
+          y += ROW_H;
+        });
+      });
+      var svgH = y + PAD_BOT;
+
+      // ── Workstream colors ──
+      var wsColorMap = {};
+      groupOrder.forEach(function(ws, i){ wsColorMap[ws] = WS_COLORS[i % WS_COLORS.length]; });
+
+      // ── Build SVG ──
+      var svg = document.getElementById("gantt-ws-svg");
+      if (!svg) return;
+      svg.setAttribute("height", svgH);
+      svg.style.width = "100%";
+
+      var parts = [];
+
+      // Use a foreignObject trick: get actual pixel width via getBoundingClientRect
+      var svgW = svg.getBoundingClientRect().width || 900;
+      var chartW = svgW - LABEL_W;
+      svg.setAttribute("width", svgW);
+      svg.setAttribute("viewBox", "0 0 " + svgW + " " + svgH);
+
+      function xPx(d) { return LABEL_W + xPct(d) / 100 * chartW; }
+
+      // Background
+      parts.push('<rect width="' + svgW + '" height="' + svgH + '" fill="#151b24"/>');
+
+      // ── Month bands and labels ──
+      var d = new Date(minD.getFullYear(), minD.getMonth(), 1);
+      var monthIdx = 0;
+      while (d <= maxD) {
+        var nextM = new Date(d.getFullYear(), d.getMonth()+1, 1);
+        var x1 = Math.max(LABEL_W, xPx(d));
+        var x2 = Math.min(svgW, xPx(nextM));
+        if (monthIdx % 2 === 0) {
+          parts.push('<rect x="' + x1 + '" y="0" width="' + (x2-x1) + '" height="' + svgH + '" fill="rgba(255,255,255,0.02)"/>');
+        }
+        var mx = x1 + (x2-x1)/2;
+        var mLabel = d.toLocaleString("en-US",{month:"short",year:"2-digit"});
+        parts.push('<text x="' + mx + '" y="16" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif">' + mLabel + '</text>');
+        // month divider
+        parts.push('<line x1="' + x1 + '" y1="0" x2="' + x1 + '" y2="' + svgH + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>');
+        d = nextM;
+        monthIdx++;
+      }
+
+      // Label panel background
+      parts.push('<rect x="0" y="0" width="' + LABEL_W + '" height="' + svgH + '" fill="#0e1218"/>');
+      parts.push('<line x1="' + LABEL_W + '" y1="0" x2="' + LABEL_W + '" y2="' + svgH + '" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>');
+
+      // ── Group rows and bars ──
+      var rowY = PAD_TOP;
+      groupOrder.forEach(function(ws, gi){
+        var wsColor = wsColorMap[ws];
+
+        // Group header background
+        parts.push('<rect x="0" y="' + rowY + '" width="' + svgW + '" height="' + GRP_H + '" fill="rgba(255,255,255,0.04)"/>');
+        parts.push('<rect x="0" y="' + rowY + '" width="4" height="' + GRP_H + '" fill="' + wsColor + '"/>');
+        var wsLabel = ws.length > 28 ? ws.slice(0,26)+"…" : ws;
+        parts.push('<text x="10" y="' + (rowY + GRP_H/2 + 5) + '" font-size="12" font-weight="700" fill="' + wsColor + '" font-family="sans-serif">' + wsLabel + '</text>');
+        rowY += GRP_H;
+
+        groups[ws].forEach(function(m){
+          var cy = rowY + ROW_H/2;
+          var fill = colorMode === "workstream" ? wsColor : statusFill(m.st);
+          var alpha = m.st === "complete" ? "cc" : "ee";
+
+          var etcD  = m.date      ? new Date(m.date+"T12:00:00")      : null;
+          var startD = m.startDate ? new Date(m.startDate+"T12:00:00") : null;
+
+          // Row stripe
+          parts.push('<rect x="0" y="' + rowY + '" width="' + svgW + '" height="' + ROW_H + '" fill="rgba(255,255,255,0.0)"/>');
+
+          if (startD && etcD && startD < etcD) {
+            // Bar
+            var bx = xPx(startD);
+            var bw = Math.max(4, xPx(etcD) - bx);
+            var bh = ROW_H - 8;
+            var by = rowY + 4;
+            parts.push('<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh +
+              '" rx="3" fill="' + fill + alpha + '" stroke="' + fill + '" stroke-width="1"/>');
+            // start tick
+            parts.push('<line x1="' + bx + '" y1="' + by + '" x2="' + bx + '" y2="' + (by+bh) + '" stroke="' + fill + '" stroke-width="2"/>');
+            // ETC dot
+            parts.push('<circle cx="' + xPx(etcD) + '" cy="' + cy + '" r="' + DOT_R + '" fill="' + fill + '" stroke="#151b24" stroke-width="1.5"/>');
+          } else if (etcD) {
+            // Milestone dot only
+            var dx = xPx(etcD);
+            var ds = ROW_H - 10;
+            // diamond
+            parts.push('<polygon points="' +
+              dx + ',' + (cy - ds/2) + ' ' +
+              (dx + ds/2) + ',' + cy + ' ' +
+              dx + ',' + (cy + ds/2) + ' ' +
+              (dx - ds/2) + ',' + cy +
+              '" fill="' + fill + '" stroke="#151b24" stroke-width="1.5"/>');
+          }
+
+          // Row label
+          var lbl = (m._level === "L1" ? "● " : "◦ ") + (m.label.length > 28 ? m.label.slice(0,26)+"…" : m.label);
+          parts.push('<text x="6" y="' + (cy + 4) + '" font-size="11" fill="' + (m.st==="blocked"?"#fca5a5":"#cbd5e1") +
+            '" font-family="sans-serif" font-weight="' + (m._level==="L1"?"600":"400") + '">' +
+            lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</text>');
+
+          rowY += ROW_H;
+        });
+      });
+
+      // ── Today line ──
+      if (today >= minD && today <= maxD) {
+        var tx = xPx(today);
+        parts.push('<line x1="' + tx + '" y1="' + PAD_TOP + '" x2="' + tx + '" y2="' + (svgH - PAD_BOT) +
+          '" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3"/>');
+        parts.push('<text x="' + (tx+3) + '" y="' + (PAD_TOP - 4) + '" font-size="9" fill="#f87171" font-family="sans-serif">Today</text>');
+      }
+
+      // ── Dependency arrows (drawn on top) ──
+      if (showDeps) {
+        var allItems2 = l1.concat(l2);
+        Object.keys(rowMap).forEach(function(targetLabel){
+          var tRow  = rowMap[targetLabel];
+          var depStr = (tRow.m.dependency || "").trim();
+          if (!depStr) return;
+          parseDeps(depStr).forEach(function(depName){
+            var srcM = fuzzyFindMilestone(depName, allItems2);
+            if (!srcM || !rowMap[srcM.label]) return;
+            var sRow = rowMap[srcM.label];
+            var etcD  = srcM.date ? new Date(srcM.date+"T12:00:00") : null;
+            var startD = tRow.m.startDate ? new Date(tRow.m.startDate+"T12:00:00") : (tRow.m.date ? new Date(tRow.m.date+"T12:00:00") : null);
+            if (!etcD || !startD) return;
+            var x1 = xPx(etcD);
+            var x2 = xPx(startD);
+            var y1 = sRow.y;
+            var y2 = tRow.y;
+            var mx = (x1 + x2) / 2;
+            parts.push('<path d="M ' + x1 + ' ' + y1 + ' C ' + (x1+20) + ' ' + y1 + ', ' + (x2-20) + ' ' + y2 + ', ' + x2 + ' ' + y2 + '"' +
+              ' fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.7" marker-end="url(#arrow)"/>');
+          });
+        });
+      }
+
+      // Arrow marker definition
+      parts.unshift('<defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">' +
+        '<polygon points="0 0, 7 3.5, 0 7" fill="#f59e0b" opacity="0.8"/></marker></defs>');
+
+      svg.innerHTML = parts.join("\n");
+      document.getElementById("gantt-ws-wrapper").style.display = "";
+    }
+
+    function reRenderGantt() { renderWsGantt(_ganttL1, _ganttL2); }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      var lvl = document.getElementById("gantt-ws-level");
+      var col = document.getElementById("gantt-ws-color");
+      var dep = document.getElementById("gantt-ws-deps");
+      if (lvl) lvl.addEventListener("change", reRenderGantt);
+      if (col) col.addEventListener("change", reRenderGantt);
+      if (dep) dep.addEventListener("change", reRenderGantt);
+      window.addEventListener("resize", reRenderGantt);
     });
 
     /* ── ETA History panel ── */

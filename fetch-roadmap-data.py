@@ -273,6 +273,7 @@ def main():
         "ws":         find_col(headers, ["Workstream", "workstream", "stream"]),
         "pic":        find_col(headers, ["PIC", "pic", "owner"]),
         "status":     find_col(headers, ["Status", "status"]),
+        "startDate":  find_col(headers, ["Start Date", "start date", "start", "Start"]),
         "etc":        find_col(headers, ["ETC", "etc", "target"]),
         "dependency": find_col(headers, ["Dependency", "dependency", "depends on",
                                          "depends_on", "Depends On", "blocking", "blocker"]),
@@ -283,6 +284,7 @@ def main():
     if col["pic"]       < 0: col["pic"]       = 3
     if col["status"]    < 0: col["status"]    = 4
     if col["etc"]       < 0: col["etc"]       = 6
+    # startDate and dependency stay -1 if not found
 
     def get(row, key):
         idx = col[key]
@@ -302,10 +304,13 @@ def main():
         level      = get(row, "level").upper()
         status_raw = get(row, "status")
         etc        = parse_etc(get(row, "etc"))
+        start_raw  = get(row, "startDate")
+        start_date = parse_etc(start_raw) if start_raw else ""
         item = {
             "label":      milestone,
             "ws":         get(row, "ws") or "—",
             "pic":        get(row, "pic") or "—",
+            "startDate":  start_date,
             "date":       etc,
             "statusText": status_raw,
             "st":         normalize_status(status_raw),
