@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-24T19:49:42Z",
+  "generated": "2026-04-24T19:53:27Z",
   "l1": [
     {
       "label": "Product Feature Completion",
@@ -13,7 +13,7 @@
       "dependency": "",
       "parent": "",
       "level": "L1",
-      "etcDelta": -10
+      "etcDelta": 0
     },
     {
       "label": "R18.0.0 VIP Approval",
@@ -27,7 +27,7 @@
       "dependency": "",
       "parent": "",
       "level": "L1",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "R18.1.0+ VIP Approval",
@@ -41,7 +41,7 @@
       "dependency": "",
       "parent": "",
       "level": "L1",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "R18 x.x.x VIP Approval",
@@ -55,7 +55,7 @@
       "dependency": "",
       "parent": "",
       "level": "L1",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "LKG Pre RC VIP",
@@ -363,7 +363,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -377,7 +377,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "R18.0.0 VIP Approval",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": 0
     },
@@ -391,7 +391,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -405,7 +405,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "Highway AMO SILC PMB Test Plan Complete",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -419,7 +419,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -433,7 +433,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": 0
     },
@@ -447,7 +447,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -461,7 +461,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "HFE Test Plan Complete",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -475,7 +475,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -489,7 +489,7 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": 0
     },
@@ -503,7 +503,7 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -517,7 +517,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -531,7 +531,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -545,7 +545,7 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": 0
     },
@@ -559,7 +559,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -573,7 +573,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -587,7 +587,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -601,7 +601,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": 0
     },
@@ -615,7 +615,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -629,7 +629,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": null
     },
@@ -643,7 +643,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -657,7 +657,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -671,7 +671,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -685,7 +685,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": null
     },
@@ -699,7 +699,7 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -713,7 +713,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -727,7 +727,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -741,7 +741,7 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "PMB/Scaling / Diversity Test Plan Strategy",
       "level": "L2",
       "etcDelta": null
     },
@@ -755,7 +755,7 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "ATCA Test Plan Complete",
-      "parent": "",
+      "parent": "Product Feature Completion",
       "level": "L2",
       "etcDelta": 0
     },
@@ -769,7 +769,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": null
     },
@@ -783,7 +783,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -797,7 +797,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -811,7 +811,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -825,7 +825,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -839,7 +839,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -853,7 +853,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -867,7 +867,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -881,7 +881,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -895,7 +895,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -909,7 +909,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -923,7 +923,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -937,7 +937,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -951,7 +951,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -965,7 +965,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -979,7 +979,7 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18 PMB Branch Off & Process",
       "level": "L2",
       "etcDelta": 0
     },
@@ -993,9 +993,9 @@
       "statusText": "Complete",
       "st": "complete",
       "dependency": "",
-      "parent": "",
+      "parent": "R18.0.0 VIP Approval",
       "level": "L2",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "VIP R18.0.0 PMB Shadow Mode Acceptance",
@@ -1007,9 +1007,9 @@
       "statusText": "In Progress",
       "st": "progress",
       "dependency": "",
-      "parent": "",
+      "parent": "R18.0.0 VIP Approval",
       "level": "L2",
-      "etcDelta": 3
+      "etcDelta": 0
     },
     {
       "label": "VIP R18.0.0 Exec car upgrade",
@@ -1021,9 +1021,9 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "",
-      "parent": "",
+      "parent": "R18.0.0 VIP Approval",
       "level": "L2",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "VIP R18.0.0 Mini CCB",
@@ -1035,9 +1035,9 @@
       "statusText": "Not Started",
       "st": "notstarted",
       "dependency": "",
-      "parent": "",
+      "parent": "R18.0.0 VIP Approval",
       "level": "L2",
-      "etcDelta": 1
+      "etcDelta": 0
     },
     {
       "label": "PMB Cars Upgraded with R18.0.0 VIP",
@@ -1049,7 +1049,7 @@
       "statusText": "Blocked",
       "st": "blocked",
       "dependency": "R18.0.0 VIP Approval",
-      "parent": "",
+      "parent": "R18.0.0 VIP Approval",
       "level": "L2",
       "etcDelta": 0
     }
