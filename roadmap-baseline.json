@@ -1,7 +1,7 @@
 {
   "milestones": {
     "Product Feature Completion": "2026-04-24",
-    "R18.0.0 VIP": "2026-04-27",
+    "R18.0.0 VIP": "2026-04-24",
     "R18.1.0+ VIP": "2026-05-05",
     "R18 x.x.x VIP": "2026-05-22",
     "LKG Pre RC VIP": "2026-06-12",
@@ -9,9 +9,9 @@
     "Complete Fleet Transition to R18.0.0  VIP": "2026-04-29",
     "L2PP Sweeping CA": "2026-04-26",
     "L2PP Sweeping TX": "2026-06-07",
-    "L2PP Sweeping NJ": "2026-06-07",
+    "L2PP Sweeping NJ": "2026-07-12",
     "Sweeping - VnV Testing Completion": "2026-07-12",
-    "USA PMB/Scaling / Diversity Test Plan Strategy": "2026-04-23",
+    "USA PMB/Scaling / Diversity Test Plan Strategy": "2026-04-22",
     "USA PMB/Scaling / Diversity Test Execution Plan": "2026-04-27",
     "USA Scaling PMB - Diversity Testing Start": "2026-04-27",
     "EU PMB/Scaling / Diversity Test Plan Strategy": "2026-04-24",
@@ -58,8 +58,8 @@
     "Main Freeze": "2026-05-20",
     "Branch Fast Forward": "2026-05-22",
     "Daily Build Starts": "2026-05-23",
-    "VIP R18.0.0 PMB Shadow Mode Acceptance": "2026-04-24",
-    "VIP R18.0.0 Mini CCB": "2026-04-27",
+    "VIP R18.0.0 PMB Shadow Mode Acceptance": "2026-04-23",
+    "VIP R18.0.0 Mini CCB": "2026-04-24",
     "PMB Cars Upgraded with R18.0.0 VIP": "2026-04-29"
   }
 }
