@@ -1540,8 +1540,10 @@
           parts.push('<polygon points="'+dx+','+(cy-ds/2)+' '+(dx+ds/2)+','+cy+' '+dx+','+(cy+ds/2)+' '+(dx-ds/2)+','+cy+
             '" fill="'+l1Fill+'" stroke="#151b24" stroke-width="2"/>');
         }
-        if (etcD) parts.push('<text x="'+(xPx(etcD)+7)+'" y="'+(cy+4)+'" font-size="9" fill="#94a3b8" font-family="sans-serif">'+
-          (l1m.date||"").slice(5)+'</text>');
+        if (etcD) {
+          var l1DateLbl = l1m.date ? l1m.date.slice(5).replace("-","/") : "";
+          parts.push('<text x="'+(xPx(etcD)+7)+'" y="'+(cy+4)+'" font-size="10" font-weight="600" fill="#e2e8f0" font-family="sans-serif">'+l1DateLbl+'</text>');
+        }
 
         /* vertical connector line from L1 down to last child */
         if (children.length) {
@@ -1586,6 +1588,12 @@
             parts.push('<polygon points="'+dx+','+(l2cy-ds/2)+' '+(dx+ds/2)+','+l2cy+' '+dx+','+(l2cy+ds/2)+' '+(dx-ds/2)+','+l2cy+
               '" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
           }
+          /* ETC date label for L2 */
+          if (l2Etc) {
+            var etcLblX = xPx(l2Etc) + 7;
+            var etcLbl  = l2m.date ? l2m.date.slice(5).replace("-","/") : "";
+            parts.push('<text x="'+etcLblX+'" y="'+(l2cy+4)+'" font-size="9" fill="'+txCol+'" font-family="sans-serif" opacity="0.85">'+etcLbl+'</text>');
+          }
         });
       });
 
@@ -1614,6 +1622,11 @@
             var dx=xPx(l2Etc), ds=L2_H-10;
             parts.push('<polygon points="'+dx+','+(l2cy-ds/2)+' '+(dx+ds/2)+','+l2cy+' '+dx+','+(l2cy+ds/2)+' '+(dx-ds/2)+','+l2cy+
               '" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
+          }
+          /* ETC date label for ungrouped L2 */
+          if (l2Etc) {
+            var uLbl = l2m.date ? l2m.date.slice(5).replace("-","/") : "";
+            parts.push('<text x="'+(xPx(l2Etc)+7)+'" y="'+(l2cy+4)+'" font-size="9" fill="#94a3b8" font-family="sans-serif" opacity="0.85">'+uLbl+'</text>');
           }
         });
       }
