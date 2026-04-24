@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-24T16:37:51Z",
+  "generated": "2026-04-24T16:40:05Z",
   "l1": [
     {
       "label": "Product Feature Completion",
@@ -129,7 +129,7 @@
       "st": "notstarted",
       "dependency": "",
       "level": "L1",
-      "etcDelta": -35
+      "etcDelta": 0
     },
     {
       "label": "Sweeping - VnV Testing Completion",
@@ -456,7 +456,7 @@
       "st": "complete",
       "dependency": "",
       "level": "L2",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "L2 Driving - L2p Planner Digital Replay Testing Enablement",
@@ -508,7 +508,7 @@
       "st": "complete",
       "dependency": "",
       "level": "L2",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "L2PP Urban - Digital Replay Testing Enablement",
@@ -664,7 +664,7 @@
       "st": "progress",
       "dependency": "",
       "level": "L2",
-      "etcDelta": null
+      "etcDelta": 0
     },
     {
       "label": "ATCA Test Plan Complete",
