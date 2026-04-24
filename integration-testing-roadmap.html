@@ -656,6 +656,12 @@
                   <option value="l2">L2 only</option>
                 </select>
               </label>
+              <label style="font-size:0.82rem;color:var(--muted)">Group by:
+                <select id="gantt-ws-group" style="margin-left:4px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:0.82rem">
+                  <option value="workstream">Workstream</option>
+                  <option value="l1parent">L1 Milestone</option>
+                </select>
+              </label>
               <label style="font-size:0.82rem;color:var(--muted)">Color:
                 <select id="gantt-ws-color" style="margin-left:4px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:0.82rem">
                   <option value="status">By Status</option>
@@ -1379,7 +1385,276 @@
       return null;
     }
 
+    /* ── Hierarchical Gantt: L1 milestones as parent rows, L2s grouped under them ── */
+    function renderHierarchyGantt(l1all, l2all) {
+      var colorSel = document.getElementById("gantt-ws-color");
+      var depChk   = document.getElementById("gantt-ws-deps");
+      var colorMode= colorSel ? colorSel.value : "status";
+      var showDeps = depChk   ? depChk.checked  : true;
+
+      var hier_l1 = (l1all||[]).filter(function(m){ return m.date || m.startDate; });
+      var hier_l2 = (l2all||[]).filter(function(m){ return m.date || m.startDate; });
+      if (!hier_l1.length && !hier_l2.length) return;
+
+      /* ── Time range ── */
+      var today = new Date(); today.setHours(12,0,0,0);
+      var allDates = [];
+      hier_l1.concat(hier_l2).forEach(function(m){
+        if (m.date)      allDates.push(new Date(m.date+"T12:00:00"));
+        if (m.startDate) allDates.push(new Date(m.startDate+"T12:00:00"));
+      });
+      var minD = new Date(Math.min.apply(null, allDates));
+      var maxD = new Date(Math.max.apply(null, allDates));
+      minD.setDate(minD.getDate() - 7);
+      maxD.setDate(maxD.getDate() + 14);
+      var totalMs = maxD - minD;
+
+      /* ── Build hierarchy: associate L2s with their parent L1 ── */
+      var l1ByWs = {};
+      hier_l1.forEach(function(m){
+        if (!l1ByWs[m.ws]) l1ByWs[m.ws] = [];
+        l1ByWs[m.ws].push(m);
+      });
+      var sortedL1 = hier_l1.slice().sort(function(a,b){
+        return (a.date ? new Date(a.date) : new Date("2099-01-01")) -
+               (b.date ? new Date(b.date) : new Date("2099-01-01"));
+      });
+      var childMap = {};
+      sortedL1.forEach(function(m){ childMap[m.label] = []; });
+      var ungrouped = [];
+
+      hier_l2.forEach(function(m){
+        /* 1. Explicit parent field from sheet */
+        if (m.parent && childMap[m.parent] !== undefined) {
+          childMap[m.parent].push(m); return;
+        }
+        /* 2. Workstream fallback — only when exactly one L1 shares this workstream */
+        var cands = l1ByWs[m.ws] || [];
+        if (cands.length === 1) { childMap[cands[0].label].push(m); return; }
+        ungrouped.push(m);
+      });
+      sortedL1.forEach(function(m){
+        childMap[m.label].sort(function(a,b){
+          return (a.date ? new Date(a.date) : new Date("2099-01-01")) -
+                 (b.date ? new Date(b.date) : new Date("2099-01-01"));
+        });
+      });
+
+      /* ── Layout constants ── */
+      var LABEL_W  = 240;
+      var L1_H     = 40;
+      var L2_H     = 28;
+      var GRP_GAP  = 5;
+      var PAD_TOP  = 44;
+      var PAD_BOT  = 20;
+      var INDENT   = 18;
+      var DOT_R    = 5;
+
+      /* ── Compute row Y positions ── */
+      var rowMap = {};
+      var y = PAD_TOP;
+      sortedL1.forEach(function(l1m){
+        rowMap[l1m.label] = { y: y + L1_H/2, m: l1m, isL1: true, rowY: y, rowH: L1_H };
+        y += L1_H;
+        childMap[l1m.label].forEach(function(l2m){
+          rowMap[l2m.label] = { y: y + L2_H/2, m: l2m, isL1: false, rowY: y, rowH: L2_H };
+          y += L2_H;
+        });
+        y += GRP_GAP;
+      });
+      var ungroupedHeaderY = 0;
+      if (ungrouped.length) {
+        y += 4;
+        ungroupedHeaderY = y;
+        y += L1_H;
+        ungrouped.forEach(function(l2m){
+          rowMap[l2m.label] = { y: y + L2_H/2, m: l2m, isL1: false, rowY: y, rowH: L2_H };
+          y += L2_H;
+        });
+      }
+      var svgH = y + PAD_BOT;
+
+      /* ── SVG setup ── */
+      var svg = document.getElementById("gantt-ws-svg");
+      if (!svg) return;
+      var svgW    = svg.getBoundingClientRect().width || 900;
+      var chartW  = svgW - LABEL_W;
+      svg.setAttribute("width",   svgW);
+      svg.setAttribute("height",  svgH);
+      svg.setAttribute("viewBox", "0 0 " + svgW + " " + svgH);
+
+      function xPx(d){ return LABEL_W + Math.max(0,Math.min(1,(d-minD)/totalMs))*chartW; }
+
+      var parts = [];
+      parts.push('<defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">' +
+        '<polygon points="0 0, 7 3.5, 0 7" fill="#f59e0b" opacity="0.8"/></marker></defs>');
+
+      /* background */
+      parts.push('<rect width="'+svgW+'" height="'+svgH+'" fill="#151b24"/>');
+
+      /* month bands */
+      var dm = new Date(minD.getFullYear(), minD.getMonth(), 1);
+      var monthIdx = 0;
+      while (dm <= maxD) {
+        var nextM = new Date(dm.getFullYear(), dm.getMonth()+1, 1);
+        var mx1 = Math.max(LABEL_W, xPx(dm));
+        var mx2 = Math.min(svgW, xPx(nextM));
+        if (monthIdx%2===0) parts.push('<rect x="'+mx1+'" y="0" width="'+(mx2-mx1)+'" height="'+svgH+'" fill="rgba(255,255,255,0.02)"/>');
+        parts.push('<text x="'+(mx1+(mx2-mx1)/2)+'" y="16" text-anchor="middle" font-size="11" fill="#64748b" font-family="sans-serif">'+
+          dm.toLocaleString("en-US",{month:"short",year:"2-digit"})+'</text>');
+        parts.push('<line x1="'+mx1+'" y1="0" x2="'+mx1+'" y2="'+svgH+'" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>');
+        dm = nextM; monthIdx++;
+      }
+
+      /* label panel */
+      parts.push('<rect x="0" y="0" width="'+LABEL_W+'" height="'+svgH+'" fill="#0e1218"/>');
+      parts.push('<line x1="'+LABEL_W+'" y1="0" x2="'+LABEL_W+'" y2="'+svgH+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>');
+
+      /* ── Render each L1 group ── */
+      sortedL1.forEach(function(l1m, gi){
+        var wsColor  = WS_COLORS[gi % WS_COLORS.length];
+        var rInfo    = rowMap[l1m.label];
+        var ry       = rInfo.rowY;
+        var cy       = rInfo.y;
+        var l1Fill   = colorMode==="workstream" ? wsColor : statusFill(l1m.st);
+        var children = childMap[l1m.label];
+
+        /* L1 header row */
+        parts.push('<rect x="0" y="'+ry+'" width="'+svgW+'" height="'+L1_H+'" fill="rgba(255,255,255,0.055)"/>');
+        parts.push('<rect x="0" y="'+ry+'" width="5" height="'+L1_H+'" fill="'+wsColor+'"/>');
+        var l1Lbl = l1m.label.length>32 ? l1m.label.slice(0,30)+"…" : l1m.label;
+        parts.push('<text x="12" y="'+(ry+L1_H/2+4)+'" font-size="12" font-weight="700" fill="'+wsColor+
+          '" font-family="sans-serif">◆ '+l1Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+
+          (children.length ? ' ('+children.length+')' : '')+'</text>');
+
+        /* L1 bar / diamond */
+        var etcD   = l1m.date      ? new Date(l1m.date+"T12:00:00")      : null;
+        var startD = l1m.startDate ? new Date(l1m.startDate+"T12:00:00") : null;
+        if (startD && etcD && startD < etcD) {
+          var bx=xPx(startD), bw=Math.max(4,xPx(etcD)-bx), bh=L1_H-10, by=ry+5;
+          parts.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="3" fill="'+l1Fill+'dd" stroke="'+l1Fill+'" stroke-width="1.5"/>');
+          parts.push('<line x1="'+bx+'" y1="'+by+'" x2="'+bx+'" y2="'+(by+bh)+'" stroke="'+l1Fill+'" stroke-width="2"/>');
+          parts.push('<circle cx="'+xPx(etcD)+'" cy="'+cy+'" r="'+DOT_R+'" fill="'+l1Fill+'" stroke="#151b24" stroke-width="1.5"/>');
+        } else if (etcD) {
+          var dx=xPx(etcD), ds=L1_H-12;
+          parts.push('<polygon points="'+dx+','+(cy-ds/2)+' '+(dx+ds/2)+','+cy+' '+dx+','+(cy+ds/2)+' '+(dx-ds/2)+','+cy+
+            '" fill="'+l1Fill+'" stroke="#151b24" stroke-width="2"/>');
+        }
+        if (etcD) parts.push('<text x="'+(xPx(etcD)+7)+'" y="'+(cy+4)+'" font-size="9" fill="#94a3b8" font-family="sans-serif">'+
+          (l1m.date||"").slice(5)+'</text>');
+
+        /* vertical connector line from L1 down to last child */
+        if (children.length) {
+          var connX   = INDENT/2+2;
+          var lastInf = rowMap[children[children.length-1].label];
+          parts.push('<line x1="'+connX+'" y1="'+(ry+L1_H)+'" x2="'+connX+'" y2="'+lastInf.y+'" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3,2"/>');
+        }
+
+        /* L2 child rows */
+        children.forEach(function(l2m, ci){
+          var l2Inf  = rowMap[l2m.label];
+          var l2y    = l2Inf.rowY;
+          var l2cy   = l2Inf.y;
+          var l2Fill = colorMode==="workstream" ? wsColor : statusFill(l2m.st);
+
+          if (ci%2===0) parts.push('<rect x="0" y="'+l2y+'" width="'+svgW+'" height="'+L2_H+'" fill="rgba(255,255,255,0.015)"/>');
+
+          /* connector elbow dot */
+          parts.push('<circle cx="'+(INDENT/2+2)+'" cy="'+l2cy+'" r="2.5" fill="rgba(255,255,255,0.18)"/>');
+
+          /* L2 label */
+          var l2Lbl = l2m.label.length>30 ? l2m.label.slice(0,28)+"…" : l2m.label;
+          var txCol = l2m.st==="blocked" ? "#fca5a5" : "#94a3b8";
+          parts.push('<text x="'+(INDENT+4)+'" y="'+(l2cy+4)+'" font-size="10" fill="'+txCol+'" font-family="sans-serif">'+
+            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</text>');
+
+          /* workstream tag (small) */
+          if (l2m.ws && l2m.ws !== l1m.ws) {
+            parts.push('<text x="'+(INDENT+4)+'" y="'+(l2cy+14)+'" font-size="8" fill="rgba(148,163,184,0.5)" font-family="sans-serif">'+
+              l2m.ws.replace(/&/g,"&amp;")+'</text>');
+          }
+
+          /* L2 bar / diamond */
+          var l2Etc   = l2m.date      ? new Date(l2m.date+"T12:00:00")      : null;
+          var l2Start = l2m.startDate ? new Date(l2m.startDate+"T12:00:00") : null;
+          if (l2Start && l2Etc && l2Start < l2Etc) {
+            var bx=xPx(l2Start), bw=Math.max(4,xPx(l2Etc)-bx), bh=L2_H-8, by=l2y+4;
+            parts.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="2" fill="'+l2Fill+'bb" stroke="'+l2Fill+'" stroke-width="1"/>');
+            parts.push('<circle cx="'+xPx(l2Etc)+'" cy="'+l2cy+'" r="'+(DOT_R-1)+'" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
+          } else if (l2Etc) {
+            var dx=xPx(l2Etc), ds=L2_H-10;
+            parts.push('<polygon points="'+dx+','+(l2cy-ds/2)+' '+(dx+ds/2)+','+l2cy+' '+dx+','+(l2cy+ds/2)+' '+(dx-ds/2)+','+l2cy+
+              '" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
+          }
+        });
+      });
+
+      /* ── Ungrouped section ── */
+      if (ungrouped.length) {
+        parts.push('<rect x="0" y="'+ungroupedHeaderY+'" width="'+svgW+'" height="'+L1_H+'" fill="rgba(255,255,255,0.03)"/>');
+        parts.push('<rect x="0" y="'+ungroupedHeaderY+'" width="5" height="'+L1_H+'" fill="#64748b"/>');
+        parts.push('<text x="12" y="'+(ungroupedHeaderY+L1_H/2+4)+'" font-size="12" font-weight="700" fill="#64748b" font-family="sans-serif">◆ Ungrouped L2 ('+ungrouped.length+')</text>');
+        ungrouped.forEach(function(l2m, ci){
+          var l2Inf  = rowMap[l2m.label];
+          var l2y    = l2Inf.rowY;
+          var l2cy   = l2Inf.y;
+          var l2Fill = statusFill(l2m.st);
+          if (ci%2===0) parts.push('<rect x="0" y="'+l2y+'" width="'+svgW+'" height="'+L2_H+'" fill="rgba(255,255,255,0.015)"/>');
+          parts.push('<circle cx="'+(INDENT/2+2)+'" cy="'+l2cy+'" r="2.5" fill="rgba(255,255,255,0.18)"/>');
+          var l2Lbl = l2m.label.length>30 ? l2m.label.slice(0,28)+"…" : l2m.label;
+          parts.push('<text x="'+(INDENT+4)+'" y="'+(l2cy+4)+'" font-size="10" fill="#94a3b8" font-family="sans-serif">'+
+            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</text>');
+          var l2Etc   = l2m.date      ? new Date(l2m.date+"T12:00:00")      : null;
+          var l2Start = l2m.startDate ? new Date(l2m.startDate+"T12:00:00") : null;
+          if (l2Start && l2Etc && l2Start < l2Etc) {
+            var bx=xPx(l2Start), bw=Math.max(4,xPx(l2Etc)-bx), bh=L2_H-8, by=l2y+4;
+            parts.push('<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="2" fill="'+l2Fill+'bb" stroke="'+l2Fill+'" stroke-width="1"/>');
+            parts.push('<circle cx="'+xPx(l2Etc)+'" cy="'+l2cy+'" r="'+(DOT_R-1)+'" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
+          } else if (l2Etc) {
+            var dx=xPx(l2Etc), ds=L2_H-10;
+            parts.push('<polygon points="'+dx+','+(l2cy-ds/2)+' '+(dx+ds/2)+','+l2cy+' '+dx+','+(l2cy+ds/2)+' '+(dx-ds/2)+','+l2cy+
+              '" fill="'+l2Fill+'" stroke="#151b24" stroke-width="1"/>');
+          }
+        });
+      }
+
+      /* ── Today line ── */
+      if (today >= minD && today <= maxD) {
+        var tx = xPx(today);
+        parts.push('<line x1="'+tx+'" y1="'+PAD_TOP+'" x2="'+tx+'" y2="'+(svgH-PAD_BOT)+'" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3"/>');
+        parts.push('<text x="'+(tx+3)+'" y="'+(PAD_TOP-4)+'" font-size="9" fill="#f87171" font-family="sans-serif">Today</text>');
+      }
+
+      /* ── Dependency arrows ── */
+      if (showDeps) {
+        var allItems2 = hier_l1.concat(hier_l2);
+        Object.keys(rowMap).forEach(function(targetLabel){
+          var tRow   = rowMap[targetLabel];
+          var depStr = (tRow.m.dependency||"").trim();
+          if (!depStr) return;
+          parseDeps(depStr).forEach(function(depName){
+            var srcM = fuzzyFindMilestone(depName, allItems2);
+            if (!srcM || !rowMap[srcM.label]) return;
+            var sRow   = rowMap[srcM.label];
+            var etcD   = srcM.date        ? new Date(srcM.date+"T12:00:00")       : null;
+            var startD = tRow.m.startDate ? new Date(tRow.m.startDate+"T12:00:00"): (tRow.m.date ? new Date(tRow.m.date+"T12:00:00") : null);
+            if (!etcD || !startD) return;
+            parts.push('<path d="M '+xPx(etcD)+' '+sRow.y+' C '+(xPx(etcD)+20)+' '+sRow.y+', '+(xPx(startD)-20)+' '+tRow.y+', '+xPx(startD)+' '+tRow.y+'"'+
+              ' fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.7" marker-end="url(#arrow)"/>');
+          });
+        });
+      }
+
+      svg.innerHTML = parts.join("\n");
+      document.getElementById("gantt-ws-wrapper").style.display = "";
+    }
+
     function renderWsGantt(l1, l2) {
+      /* Dispatch to hierarchical view when "Group by: L1 Milestone" is selected */
+      var groupBySel = document.getElementById("gantt-ws-group");
+      var groupBy    = groupBySel ? groupBySel.value : "workstream";
+      if (groupBy === "l1parent") { renderHierarchyGantt(l1, l2); return; }
+
       var levelSel = document.getElementById("gantt-ws-level");
       var colorSel = document.getElementById("gantt-ws-color");
       var depChk   = document.getElementById("gantt-ws-deps");
@@ -1598,9 +1873,11 @@
       var lvl = document.getElementById("gantt-ws-level");
       var col = document.getElementById("gantt-ws-color");
       var dep = document.getElementById("gantt-ws-deps");
+      var grp = document.getElementById("gantt-ws-group");
       if (lvl) lvl.addEventListener("change", reRenderGantt);
       if (col) col.addEventListener("change", reRenderGantt);
       if (dep) dep.addEventListener("change", reRenderGantt);
+      if (grp) grp.addEventListener("change", reRenderGantt);
       window.addEventListener("resize", reRenderGantt);
     });
 

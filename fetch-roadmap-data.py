@@ -294,6 +294,8 @@ def main():
         "etc":        find_col(headers, ["ETC", "etc", "target"]),
         "dependency": find_col(headers, ["Dependency", "dependency", "depends on",
                                          "depends_on", "Depends On", "blocking", "blocker"]),
+        "parent":     find_col(headers, ["Parent", "parent", "L1 Milestone", "L1 Group",
+                                         "Group", "belongs_to", "Belongs To", "Parent Milestone"]),
     }
     if col["milestone"] < 0: col["milestone"] = 0
     if col["level"]     < 0: col["level"]     = 1
@@ -340,6 +342,7 @@ def main():
             "statusText":  status_raw,
             "st":          normalize_status(status_raw),
             "dependency":  get(row, "dependency"),
+            "parent":      get(row, "parent"),
             "level":       level,
             "etcDelta":    compute_etc_delta(prev, {"label": milestone, "date": etc}),
         }
