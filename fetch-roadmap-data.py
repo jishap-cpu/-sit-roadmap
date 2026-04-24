@@ -31,6 +31,7 @@ TOKEN_PATH    = os.path.join(_DIR, "secrets", "token.pickle")
 SECRET_PATH   = os.path.join(_DIR, "secrets", "uploadSecret.json")
 OUTPUT_PATH   = os.path.join(_DIR, "roadmap-data.json")
 HISTORY_PATH  = os.path.join(_DIR, "roadmap-history.json")
+BASELINE_PATH = os.path.join(_DIR, "roadmap-baseline.json")
 
 # Keep at most this many history entries in the JSON file
 MAX_HISTORY   = 500
@@ -219,6 +220,22 @@ def detect_changes(prev, new_items, level, now_iso):
     return changes
 
 
+def load_baseline():
+    """Load roadmap-baseline.json — maps label → first-ever recorded ETC date."""
+    if not os.path.exists(BASELINE_PATH):
+        return {}
+    try:
+        with open(BASELINE_PATH) as f:
+            return json.load(f).get("milestones", {})
+    except Exception:
+        return {}
+
+
+def save_baseline(baseline):
+    with open(BASELINE_PATH, "w") as f:
+        json.dump({"milestones": baseline}, f, indent=2)
+
+
 def compute_etc_delta(prev, item):
     """
     Return the integer day delta since the last recorded ETC, or None.
@@ -291,8 +308,9 @@ def main():
         return row[idx].strip() if idx >= 0 and idx < len(row) else ""
 
     # ── load previous snapshot for diff ──
-    prev = load_previous_data()
-    now_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    prev     = load_previous_data()
+    baseline = load_baseline()
+    now_iso  = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     l1, l2 = [], []
     for row in rows:
@@ -306,17 +324,24 @@ def main():
         etc        = parse_etc(get(row, "etc"))
         start_raw  = get(row, "startDate")
         start_date = parse_etc(start_raw) if start_raw else ""
+        # Baseline: record this milestone's ETC the very first time we see it
+        if milestone not in baseline:
+            if etc:  # only set baseline if we have a date
+                baseline[milestone] = etc
+                print(f"  Baseline set: {milestone[:50]} → {etc}")
+
         item = {
-            "label":      milestone,
-            "ws":         get(row, "ws") or "—",
-            "pic":        get(row, "pic") or "—",
-            "startDate":  start_date,
-            "date":       etc,
-            "statusText": status_raw,
-            "st":         normalize_status(status_raw),
-            "dependency": get(row, "dependency"),
-            "level":      level,
-            "etcDelta":   compute_etc_delta(prev, {"label": milestone, "date": etc}),
+            "label":       milestone,
+            "ws":          get(row, "ws") or "—",
+            "pic":         get(row, "pic") or "—",
+            "startDate":   start_date,
+            "date":        etc,
+            "initialDate": baseline.get(milestone, ""),
+            "statusText":  status_raw,
+            "st":          normalize_status(status_raw),
+            "dependency":  get(row, "dependency"),
+            "level":       level,
+            "etcDelta":    compute_etc_delta(prev, {"label": milestone, "date": etc}),
         }
         if level == "L1":
             l1.append(item)
@@ -351,7 +376,12 @@ def main():
 
     with open(HISTORY_PATH, "w") as f:
         json.dump(history, f, indent=2)
-    print(f"History saved → roadmap-history.json ({len(history['changes'])} total entries)")
+    print(f"History saved    → roadmap-history.json ({len(history['changes'])} total entries)")
+
+    # ── write roadmap-baseline.json (first-ever ETAs, never overwritten) ──
+    save_baseline(baseline)
+    n_base = sum(1 for v in baseline.values() if v)
+    print(f"Baseline saved   → roadmap-baseline.json ({n_base} milestones with initial ETA)")
 
     # ── write roadmap-data.json ──
     output = {
@@ -364,7 +394,7 @@ def main():
 
     print(f"\nDone! Saved {len(l1)} L1 + {len(l2)} L2 milestones → roadmap-data.json")
     print("\nPush to GitHub:")
-    print("  git add roadmap-data.json roadmap-history.json && git commit -m 'Update roadmap data' && git push")
+    print("  git add roadmap-data.json roadmap-history.json roadmap-baseline.json && git commit -m 'Update roadmap data' && git push")
 
 
 if __name__ == "__main__":

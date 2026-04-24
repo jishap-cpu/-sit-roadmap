@@ -23,13 +23,13 @@ log "Running fetch-roadmap-data.py…"
 "$PYTHON" "$SCRIPT" >> "$LOG_FILE" 2>&1
 
 # Check if roadmap-data.json actually changed
-if git diff --quiet roadmap-data.json roadmap-history.json 2>/dev/null && \
-   ! git ls-files --others --exclude-standard | grep -q "roadmap-history.json"; then
+if git diff --quiet roadmap-data.json roadmap-history.json roadmap-baseline.json 2>/dev/null && \
+   ! git ls-files --others --exclude-standard | grep -qE "roadmap-(history|baseline)\.json"; then
   log "No changes detected — skipping push."
 else
   TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
   log "Changes detected — committing and pushing…"
-  git add roadmap-data.json roadmap-history.json
+  git add roadmap-data.json roadmap-history.json roadmap-baseline.json
   git commit -m "Auto-update roadmap data ($TIMESTAMP)"
   git push
   log "Pushed successfully."

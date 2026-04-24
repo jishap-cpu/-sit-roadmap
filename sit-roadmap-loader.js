@@ -369,10 +369,38 @@
           '" title="' + title + '">' + label + "</span>";
       }
 
+      // Initial ETA cell
+      var initDate = (m.initialDate || "").trim();
+      var initCell;
+      if (!initDate) {
+        initCell = '<td class="init-eta-cell" style="color:var(--muted,#8b95a8);font-size:0.82rem">—</td>';
+      } else if (initDate === m.date) {
+        // Same as current — no change
+        initCell = '<td class="init-eta-cell" style="color:var(--muted,#8b95a8);font-size:0.82rem">' +
+          escapeHtml(initDate) + '</td>';
+      } else {
+        // Different — highlight the slip or improvement
+        var initD   = new Date(initDate  + "T12:00:00");
+        var currD   = m.date ? new Date(m.date + "T12:00:00") : null;
+        var slippedInit = currD && currD > initD;
+        var deltaDays = currD ? Math.round((currD - initD) / 86400000) : null;
+        var dStr = deltaDays != null
+          ? (deltaDays > 0 ? " (+" + deltaDays + "d)" : " (" + deltaDays + "d)")
+          : "";
+        initCell = '<td class="init-eta-cell">' +
+          '<span style="color:' + (slippedInit ? "#fca5a5" : "#6ee7b7") + ';font-size:0.82rem" ' +
+          'title="Initial ETC: ' + initDate + ' · Current: ' + (m.date || "TBD") + dStr + '">' +
+          escapeHtml(initDate) +
+          '<span style="font-size:0.72rem;margin-left:4px;font-weight:700">' + escapeHtml(dStr) + '</span>' +
+          '</span></td>';
+      }
+
       return (
         '<tr data-ws="' + escapeHtml(m.ws || "") + '" data-label="' + escapeHtml(m.label) + '"><td>' +
         escapeHtml(etc) + deltaBadge +
-        "</td><td>" +
+        "</td>" +
+        initCell +
+        "<td>" +
         escapeHtml(m.label) +
         '</td><td><span class="ws-tag">' +
         escapeHtml(m.ws) +

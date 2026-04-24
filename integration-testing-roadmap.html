@@ -310,6 +310,8 @@
       border: 1px solid rgba(251, 191, 36, 0.2); white-space: normal; word-break: break-word;
     }
     .dep-cell { max-width: 240px; }
+    .th-initial-eta, .init-eta-cell { white-space: nowrap; }
+    .init-eta-cell { font-size: 0.82rem; }
 
     /* ETA delta badges */
     .eta-delta {
@@ -777,7 +779,7 @@
         <div class="table-wrap">
           <table class="data">
             <thead>
-              <tr><th>Target (ETC)</th><th>Milestone</th><th>Workstream</th><th>PIC</th><th>Status</th><th class="th-dependency">Dependency</th></tr>
+              <tr><th>Target (ETC)</th><th class="th-initial-eta">Initial ETA</th><th>Milestone</th><th>Workstream</th><th>PIC</th><th>Status</th><th class="th-dependency">Dependency</th></tr>
             </thead>
             <tbody id="tbody-l1"></tbody>
           </table>
@@ -835,7 +837,7 @@
         <div class="table-wrap">
           <table class="data">
             <thead>
-              <tr><th>Target (ETC)</th><th>Milestone</th><th>Workstream</th><th>PIC</th><th>Status</th><th class="th-dependency">Dependency</th></tr>
+              <tr><th>Target (ETC)</th><th class="th-initial-eta">Initial ETA</th><th>Milestone</th><th>Workstream</th><th>PIC</th><th>Status</th><th class="th-dependency">Dependency</th></tr>
             </thead>
             <tbody id="tbody-l2"></tbody>
           </table>
