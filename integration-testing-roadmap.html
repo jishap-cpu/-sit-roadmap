@@ -709,7 +709,7 @@
         <div class="eta-history-header">
           <span class="eta-history-title">ETA Change History</span>
           <span id="eta-history-count" class="eta-history-count"></span>
-          <button id="eta-history-toggle" class="eta-history-toggle" onclick="toggleHistoryPanel()">Hide</button>
+          <button id="eta-history-toggle" class="eta-history-toggle">Hide</button>
         </div>
         <div id="eta-history-body" class="eta-history-body">
           <div id="eta-history-list" class="eta-history-list">Loading…</div>
@@ -1613,6 +1613,12 @@
       body.style.display = hidden ? "" : "none";
       btn.textContent    = hidden ? "Hide" : "Show";
     }
+    window.toggleHistoryPanel = toggleHistoryPanel;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var btn = document.getElementById("eta-history-toggle");
+      if (btn) btn.addEventListener("click", toggleHistoryPanel);
+    });
 
     function fmtDate(iso) {
       if (!iso) return "—";
