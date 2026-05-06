@@ -20,7 +20,8 @@ import re
 from datetime import datetime, timedelta
 
 SHEET_URL    = "https://docs.google.com/spreadsheets/d/1UyHzvdtqED7Rz0fDtsvms0V7e_9kcnaDbYKaSaEO5IM/"
-SHEET_GID    = 539542201
+SHEET_GID    = 539542201          # fallback if tab name match fails
+SHEET_TAB    = "R18 Program Milestones_V2"
 SCOPES       = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
@@ -115,6 +116,14 @@ def normalize_status(raw):
         return "blocked"
     if "not start" in s:
         return "notstarted"
+    if "wip - delayed" in s or "wip-delayed" in s:
+        return "wip_delayed"
+    if "wip - on track" in s or "wip-on track" in s or "wip_on" in s:
+        return "wip_ontrack"
+    if "deferred" in s:
+        return "deferred"
+    if "de-scoped" in s or "descoped" in s:
+        return "descoped"
     if "progress" in s:
         return "progress"
     return "unspecified"
@@ -263,15 +272,20 @@ def main():
     print("Opening spreadsheet…")
     spreadsheet = client.open_by_url(SHEET_URL)
 
+    # Find tab by name first, then fall back to GID, then first sheet
     worksheet = None
     for ws in spreadsheet.worksheets():
-        if ws.id == SHEET_GID:
+        if ws.title.strip() == SHEET_TAB:
             worksheet = ws
             break
-
+    if worksheet is None:
+        for ws in spreadsheet.worksheets():
+            if ws.id == SHEET_GID:
+                worksheet = ws
+                break
     if worksheet is None:
         worksheet = spreadsheet.sheet1
-        print(f"Warning: tab with GID {SHEET_GID} not found — using first tab: '{worksheet.title}'")
+        print(f"Warning: tab '{SHEET_TAB}' not found — using first tab: '{worksheet.title}'")
     else:
         print(f"Reading tab: '{worksheet.title}'")
 
@@ -294,7 +308,8 @@ def main():
         "etc":        find_col(headers, ["ETC", "etc", "target"]),
         "dependency": find_col(headers, ["Dependency", "dependency", "depends on",
                                          "depends_on", "Depends On", "blocking", "blocker"]),
-        "parent":     find_col(headers, ["Parent", "parent", "L1 Milestone", "L1 Group",
+        "parent":     find_col(headers, ["Parent Level", "Parent level", "parent level",
+                                         "Parent", "parent", "L1 Milestone", "L1 Group",
                                          "Group", "belongs_to", "Belongs To", "Parent Milestone"]),
     }
     if col["milestone"] < 0: col["milestone"] = 0
