@@ -234,15 +234,23 @@
     if (s.indexOf("complete") !== -1 && s.indexOf("in progress") === -1) return "complete";
     if (s.indexOf("block") !== -1) return "blocked";
     if (s.indexOf("not start") !== -1 || s === "not started") return "notstarted";
+    if (s.indexOf("wip - delayed") !== -1 || s.indexOf("wip-delayed") !== -1) return "wip_delayed";
+    if (s.indexOf("wip - on track") !== -1 || s.indexOf("wip-on track") !== -1) return "wip_ontrack";
+    if (s.indexOf("deferred") !== -1) return "deferred";
+    if (s.indexOf("de-scoped") !== -1 || s.indexOf("descoped") !== -1) return "descoped";
     if (s.indexOf("progress") !== -1) return "progress";
     return "unspecified";
   }
 
   function statusDisplay(st) {
-    if (st === "complete") return "Complete";
-    if (st === "blocked") return "Blocked";
-    if (st === "notstarted") return "Not Started";
-    if (st === "progress") return "In Progress";
+    if (st === "complete")    return "Complete";
+    if (st === "blocked")     return "Blocked";
+    if (st === "notstarted")  return "Not Started";
+    if (st === "progress")    return "In Progress";
+    if (st === "wip_delayed") return "WIP - Delayed";
+    if (st === "wip_ontrack") return "WIP - On Track";
+    if (st === "deferred")    return "Deferred";
+    if (st === "descoped")    return "De-scoped";
     return "—";
   }
 
@@ -325,9 +333,13 @@
   }
 
   function statusClass(st) {
-    if (st === "blocked") return "blocked";
-    if (st === "notstarted") return "notstarted";
-    if (st === "complete") return "complete";
+    if (st === "blocked")     return "blocked";
+    if (st === "notstarted")  return "notstarted";
+    if (st === "complete")    return "complete";
+    if (st === "wip_delayed") return "wip_delayed";
+    if (st === "wip_ontrack") return "wip_ontrack";
+    if (st === "deferred")    return "deferred";
+    if (st === "descoped")    return "descoped";
     if (st === "unspecified") return "unspecified";
     return "progress";
   }
@@ -468,9 +480,13 @@
   }
 
   function markerClass(st) {
-    if (st === "blocked") return "blocked";
-    if (st === "notstarted") return "notstarted";
-    if (st === "complete") return "complete";
+    if (st === "blocked")     return "blocked";
+    if (st === "notstarted")  return "notstarted";
+    if (st === "complete")    return "complete";
+    if (st === "wip_delayed") return "wip_delayed";
+    if (st === "wip_ontrack") return "wip_ontrack";
+    if (st === "deferred")    return "deferred";
+    if (st === "descoped")    return "descoped";
     if (st === "unspecified") return "unspecified";
     return "progress";
   }
@@ -601,9 +617,9 @@
     var st = countBy(data, function (m) {
       return m.st;
     });
-    var l1Labels = ["Complete", "In progress", "Blocked", "Not started", "Unspecified"];
-    var l1Keys = ["complete", "progress", "blocked", "notstarted", "unspecified"];
-    var l1Colors = ["#22c55e", "#3b82f6", "#f87171", "#64748b", "#475569"];
+    var l1Labels = ["Complete", "In Progress", "WIP - On Track", "WIP - Delayed", "Blocked", "Not Started", "Deferred", "De-scoped", "Unspecified"];
+    var l1Keys   = ["complete", "progress", "wip_ontrack", "wip_delayed", "blocked", "notstarted", "deferred", "descoped", "unspecified"];
+    var l1Colors = ["#22c55e", "#3b82f6", "#06b6d4", "#f97316", "#f87171", "#64748b", "#a78bfa", "#94a3b8", "#475569"];
     var d1 = [];
     var lab1 = [];
     var col1 = [];
@@ -724,9 +740,9 @@
     var st = countBy(data, function (m) {
       return m.st;
     });
-    var l2Labels = ["Complete", "In progress", "Blocked", "Not started", "Unspecified"];
-    var l2Keys = ["complete", "progress", "blocked", "notstarted", "unspecified"];
-    var l2Colors = ["#22c55e", "#3b82f6", "#f87171", "#64748b", "#475569"];
+    var l2Labels = ["Complete", "In Progress", "WIP - On Track", "WIP - Delayed", "Blocked", "Not Started", "Deferred", "De-scoped", "Unspecified"];
+    var l2Keys   = ["complete", "progress", "wip_ontrack", "wip_delayed", "blocked", "notstarted", "deferred", "descoped", "unspecified"];
+    var l2Colors = ["#22c55e", "#3b82f6", "#06b6d4", "#f97316", "#f87171", "#64748b", "#a78bfa", "#94a3b8", "#475569"];
     var l2Data = [];
     var l2Lab = [];
     var l2Col = [];

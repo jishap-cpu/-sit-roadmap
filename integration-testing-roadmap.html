@@ -179,11 +179,15 @@
       display: flex; height: 5px; border-radius: 4px; overflow: hidden; gap: 2px;
     }
     .ws-status-seg { border-radius: 2px; transition: flex 0.3s; }
-    .ws-status-seg.progress  { background: #3b82f6; }
-    .ws-status-seg.blocked   { background: #f87171; }
-    .ws-status-seg.notstarted{ background: #64748b; }
-    .ws-status-seg.complete  { background: #22c55e; }
-    .ws-status-seg.unspecified{ background: #475569; }
+    .ws-status-seg.progress    { background: #3b82f6; }
+    .ws-status-seg.blocked     { background: #f87171; }
+    .ws-status-seg.notstarted  { background: #64748b; }
+    .ws-status-seg.complete    { background: #22c55e; }
+    .ws-status-seg.wip_delayed { background: #f97316; }
+    .ws-status-seg.wip_ontrack { background: #06b6d4; }
+    .ws-status-seg.deferred    { background: #a78bfa; }
+    .ws-status-seg.descoped    { background: #94a3b8; }
+    .ws-status-seg.unspecified { background: #475569; }
 
     .ws-ms-list {
       padding: 0.5rem 1.25rem 0.75rem;
@@ -192,8 +196,12 @@
     }
     .ws-ms-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.84rem; }
     .ws-ms-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .ws-ms-dot.progress   { background: #3b82f6; }
-    .ws-ms-dot.blocked    { background: #f87171; }
+    .ws-ms-dot.progress    { background: #3b82f6; }
+    .ws-ms-dot.blocked     { background: #f87171; }
+    .ws-ms-dot.wip_delayed { background: #f97316; }
+    .ws-ms-dot.wip_ontrack { background: #06b6d4; }
+    .ws-ms-dot.deferred    { background: #a78bfa; }
+    .ws-ms-dot.descoped    { background: #94a3b8; }
     .ws-ms-dot.notstarted { background: #64748b; }
     .ws-ms-dot.complete   { background: #22c55e; }
     .ws-ms-dot.unspecified{ background: #475569; }
@@ -368,16 +376,24 @@
       border-radius: 6px; white-space: nowrap;
     }
     .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
-    .status.progress  { background: rgba(59,130,246,0.2);   color: #93c5fd; }
-    .status.progress::before  { background: #3b82f6; }
-    .status.blocked   { background: rgba(248,113,113,0.15); color: #fca5a5; }
-    .status.blocked::before   { background: var(--danger); }
-    .status.notstarted{ background: rgba(148,163,184,0.15); color: #cbd5e1; }
-    .status.notstarted::before{ background: #94a3b8; }
-    .status.complete  { background: rgba(34,197,94,0.18);   color: #86efac; }
-    .status.complete::before  { background: #22c55e; }
-    .status.unspecified{ background: rgba(71,85,105,0.25);  color: #94a3b8; }
-    .status.unspecified::before{ background: #64748b; }
+    .status.progress    { background: rgba(59,130,246,0.2);   color: #93c5fd; }
+    .status.progress::before    { background: #3b82f6; }
+    .status.blocked     { background: rgba(248,113,113,0.15); color: #fca5a5; }
+    .status.blocked::before     { background: var(--danger); }
+    .status.notstarted  { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+    .status.notstarted::before  { background: #94a3b8; }
+    .status.complete    { background: rgba(34,197,94,0.18);   color: #86efac; }
+    .status.complete::before    { background: #22c55e; }
+    .status.wip_delayed { background: rgba(249,115,22,0.18);  color: #fdba74; }
+    .status.wip_delayed::before { background: #f97316; }
+    .status.wip_ontrack { background: rgba(6,182,212,0.18);   color: #67e8f9; }
+    .status.wip_ontrack::before { background: #06b6d4; }
+    .status.deferred    { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+    .status.deferred::before    { background: #a78bfa; }
+    .status.descoped    { background: rgba(148,163,184,0.18); color: #94a3b8; }
+    .status.descoped::before    { background: #94a3b8; }
+    .status.unspecified { background: rgba(71,85,105,0.25);   color: #94a3b8; }
+    .status.unspecified::before { background: #64748b; }
 
     /* ── Timeline ── */
     .timeline { margin-top: 1.5rem; position: relative; padding-left: 1.25rem; }
@@ -494,8 +510,12 @@
       transition: transform 0.15s, box-shadow 0.15s;
     }
     .gantt-marker:hover { transform: translate(-50%, -50%) scale(1.25); z-index: 3; box-shadow: 0 0 0 4px rgba(94,234,212,0.25); }
-    .gantt-marker.progress   { background: #3b82f6; }
-    .gantt-marker.blocked    { background: #f87171; }
+    .gantt-marker.progress    { background: #3b82f6; }
+    .gantt-marker.blocked     { background: #f87171; }
+    .gantt-marker.wip_delayed { background: #f97316; }
+    .gantt-marker.wip_ontrack { background: #06b6d4; }
+    .gantt-marker.deferred    { background: #a78bfa; }
+    .gantt-marker.descoped    { background: #94a3b8; }
     .gantt-marker.notstarted { background: #94a3b8; }
     .gantt-marker.complete   { background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.35); }
     .gantt-marker.unspecified{ background: #475569; box-shadow: 0 0 0 2px rgba(148,163,184,0.35); }
@@ -677,9 +697,13 @@
             <svg id="gantt-ws-svg" style="display:block;min-width:700px"></svg>
           </div>
           <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:0.6rem;font-size:0.76rem;color:var(--muted)">
+            <span><span style="display:inline-block;width:12px;height:12px;background:#22c55e;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Complete</span>
             <span><span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:2px;margin-right:4px;vertical-align:middle"></span>In Progress</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#06b6d4;border-radius:2px;margin-right:4px;vertical-align:middle"></span>WIP - On Track</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#f97316;border-radius:2px;margin-right:4px;vertical-align:middle"></span>WIP - Delayed</span>
             <span><span style="display:inline-block;width:12px;height:12px;background:#ef4444;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Blocked</span>
-            <span><span style="display:inline-block;width:12px;height:12px;background:#10b981;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Complete</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#a78bfa;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Deferred</span>
+            <span><span style="display:inline-block;width:12px;height:12px;background:#94a3b8;border-radius:2px;margin-right:4px;vertical-align:middle"></span>De-scoped</span>
             <span><span style="display:inline-block;width:12px;height:12px;background:#64748b;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Not Started</span>
             <span><span style="display:inline-block;width:32px;height:2px;background:#f59e0b;vertical-align:middle;margin-right:4px"></span>Dependency</span>
             <span><span style="display:inline-block;width:2px;height:12px;background:#f87171;vertical-align:middle;margin-right:4px"></span>Today</span>
@@ -1179,13 +1203,18 @@
         var total = all.length;
         var st = {};
         all.forEach(function (m) { st[m.st] = (st[m.st] || 0) + 1; });
-        var blocked = st.blocked || 0;
-        var done = st.complete || 0;
+        var blocked   = st.blocked || 0;
+        var done      = st.complete || 0;
+        var deferred  = st.deferred || 0;
+        var descoped  = st.descoped || 0;
+        var wipDelay  = st.wip_delayed || 0;
 
-        var segs = ["progress", "blocked", "notstarted", "complete", "unspecified"].map(function (k) {
+        var segOrder = ["complete", "wip_ontrack", "progress", "wip_delayed", "blocked", "notstarted", "deferred", "descoped", "unspecified"];
+        var segLabels = { complete: "Complete", wip_ontrack: "WIP - On Track", progress: "In Progress", wip_delayed: "WIP - Delayed", blocked: "Blocked", notstarted: "Not Started", deferred: "Deferred", descoped: "De-scoped", unspecified: "Unspecified" };
+        var segs = segOrder.map(function (k) {
           var n = st[k] || 0;
           if (!n) return "";
-          return '<div class="ws-status-seg ' + k + '" style="flex:' + n + '" title="' + k + ": " + n + '"></div>';
+          return '<div class="ws-status-seg ' + k + '" style="flex:' + n + '" title="' + segLabels[k] + ": " + n + '"></div>';
         }).join("");
 
         var l1Section = "";
@@ -1212,8 +1241,11 @@
           '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">' +
           (ws.l1.length ? '<span class="ws-count-badge">L1 &times;' + ws.l1.length + "</span>" : "") +
           (ws.l2.length ? '<span class="ws-count-badge">L2 &times;' + ws.l2.length + "</span>" : "") +
-          (blocked ? '<span class="ws-count-badge" style="color:#fca5a5;background:rgba(248,113,113,0.12)">' + blocked + " blocked</span>" : "") +
-          (done ? '<span class="ws-count-badge" style="color:#86efac;background:rgba(34,197,94,0.1)">' + done + " done</span>" : "") +
+          (blocked  ? '<span class="ws-count-badge" style="color:#fca5a5;background:rgba(248,113,113,0.12)">'   + blocked  + " blocked</span>"       : "") +
+          (wipDelay ? '<span class="ws-count-badge" style="color:#fdba74;background:rgba(249,115,22,0.12)">'    + wipDelay + " WIP-delayed</span>"   : "") +
+          (deferred ? '<span class="ws-count-badge" style="color:#c4b5fd;background:rgba(167,139,250,0.12)">'   + deferred + " deferred</span>"      : "") +
+          (descoped ? '<span class="ws-count-badge" style="color:#94a3b8;background:rgba(148,163,184,0.12)">'   + descoped + " de-scoped</span>"     : "") +
+          (done     ? '<span class="ws-count-badge" style="color:#86efac;background:rgba(34,197,94,0.1)">'      + done     + " done</span>"          : "") +
           "</div></div>" +
           '<div style="padding:0.6rem 1.25rem 0"><div class="ws-status-bar" style="margin:0">' + segs + "</div></div>" +
           l1Section + l2Summary +
@@ -1523,9 +1555,11 @@
         parts.push('<rect x="0" y="'+ry+'" width="'+svgW+'" height="'+L1_H+'" fill="rgba(255,255,255,0.055)"/>');
         parts.push('<rect x="0" y="'+ry+'" width="5" height="'+L1_H+'" fill="'+wsColor+'"/>');
         var l1Lbl = l1m.label.length>32 ? l1m.label.slice(0,30)+"…" : l1m.label;
+        var l1Title = (l1m.label+' | ETC: '+(l1m.date||'TBD')+' | '+( l1m.statusText||l1m.st)+' | '+l1m.ws).replace(/&/g,"&amp;").replace(/</g,"&lt;");
         parts.push('<text x="12" y="'+(ry+L1_H/2+4)+'" font-size="12" font-weight="700" fill="'+wsColor+
           '" font-family="sans-serif">◆ '+l1Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+
-          (children.length ? ' ('+children.length+')' : '')+'</text>');
+          (children.length ? ' ('+children.length+')' : '')+
+          '<title>'+l1Title+'</title></text>');
 
         /* L1 bar / diamond */
         var etcD   = l1m.date      ? new Date(l1m.date+"T12:00:00")      : null;
@@ -1567,8 +1601,9 @@
           /* L2 label */
           var l2Lbl = l2m.label.length>30 ? l2m.label.slice(0,28)+"…" : l2m.label;
           var txCol = l2m.st==="blocked" ? "#fca5a5" : "#94a3b8";
+          var l2Title = (l2m.label+' | ETC: '+(l2m.date||'TBD')+' | '+(l2m.statusText||l2m.st)+' | '+l2m.ws).replace(/&/g,"&amp;").replace(/</g,"&lt;");
           parts.push('<text x="'+(INDENT+4)+'" y="'+(l2cy+4)+'" font-size="10" fill="'+txCol+'" font-family="sans-serif">'+
-            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</text>');
+            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'<title>'+l2Title+'</title></text>');
 
           /* workstream tag (small) */
           if (l2m.ws && l2m.ws !== l1m.ws) {
@@ -1610,8 +1645,9 @@
           if (ci%2===0) parts.push('<rect x="0" y="'+l2y+'" width="'+svgW+'" height="'+L2_H+'" fill="rgba(255,255,255,0.015)"/>');
           parts.push('<circle cx="'+(INDENT/2+2)+'" cy="'+l2cy+'" r="2.5" fill="rgba(255,255,255,0.18)"/>');
           var l2Lbl = l2m.label.length>30 ? l2m.label.slice(0,28)+"…" : l2m.label;
+          var ugTitle = (l2m.label+' | ETC: '+(l2m.date||'TBD')+' | '+(l2m.statusText||l2m.st)+' | '+l2m.ws).replace(/&/g,"&amp;").replace(/</g,"&lt;");
           parts.push('<text x="'+(INDENT+4)+'" y="'+(l2cy+4)+'" font-size="10" fill="#94a3b8" font-family="sans-serif">'+
-            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</text>');
+            l2Lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'<title>'+ugTitle+'</title></text>');
           var l2Etc   = l2m.date      ? new Date(l2m.date+"T12:00:00")      : null;
           var l2Start = l2m.startDate ? new Date(l2m.startDate+"T12:00:00") : null;
           if (l2Start && l2Etc && l2Start < l2Etc) {
@@ -1831,9 +1867,11 @@
 
           // Row label
           var lbl = (m._level === "L1" ? "● " : "◦ ") + (m.label.length > 28 ? m.label.slice(0,26)+"…" : m.label);
+          var wsRowTitle = (m.label+' | ETC: '+(m.date||'TBD')+' | '+(m.statusText||m.st)+' | '+m.ws).replace(/&/g,"&amp;").replace(/</g,"&lt;");
           parts.push('<text x="6" y="' + (cy + 4) + '" font-size="11" fill="' + (m.st==="blocked"?"#fca5a5":"#cbd5e1") +
             '" font-family="sans-serif" font-weight="' + (m._level==="L1"?"600":"400") + '">' +
-            lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</text>');
+            lbl.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") +
+            '<title>'+wsRowTitle+'</title></text>');
 
           rowY += ROW_H;
         });
