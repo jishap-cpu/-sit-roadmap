@@ -29,7 +29,8 @@ if git diff --quiet roadmap-data.json roadmap-history.json roadmap-baseline.json
 else
   TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
   log "Changes detected — committing and pushing…"
-  git add roadmap-data.json roadmap-history.json roadmap-baseline.json
+  git add roadmap-data.json roadmap-history.json roadmap-baseline.json \
+          integration-testing-roadmap.html sit-roadmap-loader.js fetch-roadmap-data.py
   git commit -m "Auto-update roadmap data ($TIMESTAMP)"
   git push
   log "Pushed successfully."
