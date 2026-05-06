@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-06T13:28:07Z",
+  "generated": "2026-05-06T13:54:39Z",
   "l1": [
     {
       "label": "Product Feature Completion",
@@ -174,28 +174,28 @@
       "ws": "InCar Testing",
       "pic": "Bruce",
       "startDate": "2026-04-20",
-      "date": "2026-04-23",
+      "date": "2026-05-08",
       "initialDate": "2026-04-22",
-      "statusText": "Complete",
-      "st": "complete",
+      "statusText": "WIP - On Track",
+      "st": "wip_ontrack",
       "dependency": "",
       "parent": "",
       "level": "L1",
-      "etcDelta": 0
+      "etcDelta": 15
     },
     {
       "label": "USA PMB/Scaling / Diversity Test Execution Plan",
       "ws": "InCar Testing",
       "pic": "Bruce",
       "startDate": "2026-04-20",
-      "date": "2026-04-27",
+      "date": "2026-05-07",
       "initialDate": "2026-04-27",
-      "statusText": "WIP - Delayed",
-      "st": "wip_delayed",
-      "dependency": "",
+      "statusText": "WIP - On Track",
+      "st": "wip_ontrack",
+      "dependency": "Unified Planner BP related CL in PMB",
       "parent": "",
       "level": "L1",
-      "etcDelta": 0
+      "etcDelta": 10
     },
     {
       "label": "USA Scaling PMB - Diversity Testing Start",
@@ -422,6 +422,48 @@
       "parent": "Triage & KPI Plan Completion",
       "level": "L2",
       "etcDelta": 0
+    },
+    {
+      "label": "Highway SILC CLassical  Test Plan Complete",
+      "ws": "\u2014",
+      "pic": "\u2014",
+      "startDate": "",
+      "date": "",
+      "initialDate": "",
+      "statusText": "Complete",
+      "st": "complete",
+      "dependency": "",
+      "parent": "",
+      "level": "L2",
+      "etcDelta": null
+    },
+    {
+      "label": "ECE Config Enablement in PMB",
+      "ws": "Product",
+      "pic": "Kaiyuan Wei",
+      "startDate": "",
+      "date": "2026-05-06",
+      "initialDate": "2026-05-06",
+      "statusText": "WIP - On Track",
+      "st": "wip_ontrack",
+      "dependency": "",
+      "parent": "Product Feature Completion",
+      "level": "L2",
+      "etcDelta": null
+    },
+    {
+      "label": "Unified Planner BP related CL in PMB",
+      "ws": "Product",
+      "pic": "Kyle",
+      "startDate": "",
+      "date": "2026-05-06",
+      "initialDate": "2026-05-06",
+      "statusText": "WIP - On Track",
+      "st": "wip_ontrack",
+      "dependency": "",
+      "parent": "Product Feature Completion",
+      "level": "L2",
+      "etcDelta": null
     },
     {
       "label": "HFE Feature in PMB",
