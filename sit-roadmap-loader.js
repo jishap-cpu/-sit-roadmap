@@ -608,8 +608,8 @@
 
   function renderChartsL1(data) {
     if (typeof Chart === "undefined") return;
-    Chart.defaults.color = "#8b95a8";
-    Chart.defaults.borderColor = "rgba(255,255,255,0.08)";
+    Chart.defaults.color = "#64748b";
+    Chart.defaults.borderColor = "rgba(0,0,0,0.07)";
     Chart.defaults.font.family = "'Source Sans 3', system-ui, sans-serif";
 
     ["chart-status", "chart-workstream", "chart-weekly"].forEach(destroyChart);
@@ -641,7 +641,7 @@
             data: d1,
             backgroundColor: col1,
             borderWidth: 2,
-            borderColor: "#151b24",
+            borderColor: "#ffffff",
             hoverOffset: 6
           }]
         },
@@ -731,8 +731,8 @@
 
   function renderChartsL2(data) {
     if (typeof Chart === "undefined") return;
-    Chart.defaults.color = "#8b95a8";
-    Chart.defaults.borderColor = "rgba(255,255,255,0.08)";
+    Chart.defaults.color = "#64748b";
+    Chart.defaults.borderColor = "rgba(0,0,0,0.07)";
     Chart.defaults.font.family = "'Source Sans 3', system-ui, sans-serif";
 
     ["chart-l2-status", "chart-l2-workstream", "chart-l2-weekly"].forEach(destroyChart);
@@ -765,7 +765,7 @@
             data: l2Data,
             backgroundColor: l2Col,
             borderWidth: 2,
-            borderColor: "#151b24",
+            borderColor: "#ffffff",
             hoverOffset: 6
           }]
         },
