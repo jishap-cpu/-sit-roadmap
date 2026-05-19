@@ -42,7 +42,10 @@
     codaJsonUrl: "coda-roadmap-data.json",
 
     /** "Open Coda source" link shown in the page header */
-    openCodaUrl: "https://coda.io/d/SIT-PMB-Roadmap_dGDLsJnP2Ir/R18-PMB-Milestones_sujMr0sb#R18-Program-Milestones_tujbDyvO"
+    openCodaUrl: "https://coda.io/d/SIT-PMB-Roadmap_dGDLsJnP2Ir/R18-PMB-Milestones_sujMr0sb#R18-Program-Milestones_tujbDyvO",
+
+    /** Coda page mirrored by the web Exec Dashboard tab */
+    execDashboardUrl: "https://coda.io/d/_dGDLsJnP2Ir/_suMq_4j0"
   };
 
   var qp = new URLSearchParams(window.location.search || "");
@@ -60,6 +63,7 @@
   var ROADMAP_L2 = [];
   var ROADMAP_PROGRAMS = {};
   var ROADMAP_PROGRAM_ORDER = ["R18", "R19", "L3"];
+  var EXEC_SELECTED_PROGRAM = "R18";
 
   var FALLBACK_L1 = [
     { date: "2026-04-22", label: "PMB/Scaling / Diversity Test Plan Strategy", ws: "InCar Testing", st: "progress" },
@@ -600,6 +604,416 @@
     });
   }
 
+  function parseExecDate(iso) {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+    var d = new Date(iso + "T12:00:00");
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function fmtExecDate(iso) {
+    return iso || "TBD";
+  }
+
+  function execItems(program) {
+    return ((program && program.l1) || []).concat((program && program.l2) || [])
+      .map(function (m) {
+        var item = Object.assign({}, m);
+        item.end = parseExecDate(m.date);
+        item.start = parseExecDate(m.startDate);
+        return item;
+      });
+  }
+
+  function isExecInactive(item) {
+    var statusText = String(item.statusText || "").toLowerCase();
+    return item.st === "complete" ||
+      item.st === "descoped" ||
+      item.st === "deferred" ||
+      statusText.indexOf("not applicable") !== -1;
+  }
+
+  function sortByDueThenName(a, b) {
+    var ad = a.end ? a.end.getTime() : 9e15;
+    var bd = b.end ? b.end.getTime() : 9e15;
+    if (ad !== bd) return ad - bd;
+    return String(a.label || "").localeCompare(String(b.label || ""));
+  }
+
+  function countStatus(items) {
+    var map = {};
+    items.forEach(function (item) {
+      var label = item.statusText || statusDisplay(item.st || "unspecified");
+      map[label] = (map[label] || 0) + 1;
+    });
+    return map;
+  }
+
+  function countWorkstream(items) {
+    var map = {};
+    items.forEach(function (item) {
+      var label = item.ws || "-";
+      map[label] = (map[label] || 0) + 1;
+    });
+    return map;
+  }
+
+  function mapRows(map, labelKey, valueKey) {
+    return Object.keys(map).sort(function (a, b) {
+      return map[b] - map[a] || a.localeCompare(b);
+    }).map(function (key) {
+      var row = {};
+      row[labelKey] = key;
+      row[valueKey] = map[key];
+      return row;
+    });
+  }
+
+  function execSignal(item, label) {
+    var st = item.st || "unspecified";
+    var text = label || (
+      st === "blocked" ? "Red" :
+      st === "wip_delayed" ? "Yellow" :
+      st === "complete" || st === "wip_ontrack" ? "Green" :
+      st === "notstarted" ? "Gray" : "Blue"
+    );
+    return '<span class="exec-signal ' + statusClass(st) + '"><i></i>' + escapeHtml(text) + "</span>";
+  }
+
+  function execStatusPill(item) {
+    var st = item.st || "unspecified";
+    return '<span class="status ' + statusClass(st) + '">' + escapeHtml(statusDisplay(st)) + "</span>";
+  }
+
+  function execTable(title, desc, headers, rows, fields, emptyText) {
+    var body;
+    if (!rows.length) {
+      body = '<tr><td colspan="' + headers.length + '" style="color:var(--muted)">' + escapeHtml(emptyText || "No rows.") + "</td></tr>";
+    } else {
+      body = rows.map(function (row) {
+        return "<tr>" + fields.map(function (field) {
+          var value = typeof field === "function" ? field(row) : row[field];
+          return "<td>" + (value == null ? "" : value) + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+    }
+    return (
+      '<section class="exec-section">' +
+      "<h3>" + escapeHtml(title) + "</h3>" +
+      (desc ? '<p class="exec-section-desc">' + escapeHtml(desc) + "</p>" : "") +
+      '<div class="table-wrap exec-table-wrap"><table class="data">' +
+      "<thead><tr>" + headers.map(function (h) { return "<th>" + escapeHtml(h) + "</th>"; }).join("") + "</tr></thead>" +
+      "<tbody>" + body + "</tbody></table></div>" +
+      "</section>"
+    );
+  }
+
+  function buildExecDashboard(program) {
+    var items = execItems(program);
+    var active = items.filter(function (item) { return !isExecInactive(item); });
+    var l1 = items.filter(function (item) { return item.level === "L1"; });
+    var l2 = items.filter(function (item) { return item.level === "L2"; });
+    var blocked = active.filter(function (item) { return item.st === "blocked"; }).sort(sortByDueThenName);
+    var risk = active.filter(function (item) {
+      return item.st === "blocked" || item.st === "wip_delayed";
+    }).sort(sortByDueThenName);
+    var todayTime = TODAY.getTime();
+    var in14 = new Date(TODAY.getTime());
+    in14.setDate(in14.getDate() + 14);
+    var overdue = active.filter(function (item) {
+      return item.end && item.end.getTime() < todayTime;
+    }).sort(sortByDueThenName);
+    var dueToday = active.filter(function (item) {
+      return item.end && item.end.toISOString().slice(0, 10) === TODAY.toISOString().slice(0, 10);
+    });
+    var nearTerm = active.filter(function (item) {
+      return item.end && item.end.getTime() >= todayTime && item.end.getTime() <= in14.getTime();
+    }).sort(sortByDueThenName);
+    var branch = items.filter(function (item) {
+      return item.parent === "R18 PMB Branch Off & Process" ||
+        item.label === "R18 PMB Branch Off & Process";
+    }).sort(sortByDueThenName);
+    var criticalNames = [
+      "Product Feature Completion",
+      "R18.4.0 VIP Approval",
+      "Feature Freeze / MF4",
+      "R18.5.0 VIP Approval",
+      "R18 PMB Branch Off & Process",
+      "Integration Complete",
+      "SW Pre-Freeze",
+      "SW Freeze / Harlock",
+      "Zero Rel Blockers",
+      "RPD"
+    ];
+    var critical = items.filter(function (item) {
+      return criticalNames.indexOf(item.label) !== -1;
+    }).sort(function (a, b) {
+      var ad = a.end ? a.end.getTime() : 9e15;
+      var bd = b.end ? b.end.getTime() : 9e15;
+      if (ad !== bd) return ad - bd;
+      return criticalNames.indexOf(a.label) - criticalNames.indexOf(b.label);
+    });
+    var fleetTerms = ["fleet", "cars upgraded", "exec car", "transition", "shadow mode acceptance", "sit vip acceptance"];
+    var fleet = items.filter(function (item) {
+      var haystack = [item.label, item.parent, item.comments].join(" ").toLowerCase();
+      return fleetTerms.some(function (term) { return haystack.indexOf(term) !== -1; });
+    }).sort(sortByDueThenName).slice(0, 14);
+    return {
+      items: items,
+      active: active,
+      l1: l1,
+      l2: l2,
+      blocked: blocked,
+      risk: risk,
+      overdue: overdue,
+      dueToday: dueToday,
+      nearTerm: nearTerm,
+      branch: branch,
+      critical: critical,
+      fleet: fleet,
+      statusRows: mapRows(countStatus(items), "status", "count"),
+      workstreamRows: mapRows(countWorkstream(active), "workstream", "count"),
+      dueBuckets: [
+        { bucket: "Overdue", count: overdue.length },
+        { bucket: "Due today", count: dueToday.length },
+        { bucket: "Next 14 days", count: Math.max(nearTerm.length - dueToday.length, 0) },
+        { bucket: "Later / TBD", count: Math.max(active.length - overdue.length - nearTerm.length, 0) }
+      ]
+    };
+  }
+
+  function renderExecCharts(data) {
+    if (typeof Chart === "undefined") return;
+    ["exec-status-chart", "exec-workstream-chart", "exec-due-chart"].forEach(destroyChart);
+
+    var statusLabels = data.statusRows.map(function (row) { return row.status; });
+    var statusValues = data.statusRows.map(function (row) { return row.count; });
+    var statusCanvas = document.getElementById("exec-status-chart");
+    if (statusCanvas && statusValues.length) {
+      new Chart(statusCanvas, {
+        type: "doughnut",
+        data: {
+          labels: statusLabels,
+          datasets: [{
+            data: statusValues,
+            backgroundColor: ["#22c55e", "#06b6d4", "#3b82f6", "#f97316", "#f87171", "#64748b", "#a78bfa", "#94a3b8"],
+            borderColor: "#ffffff",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom", labels: { usePointStyle: true, padding: 12 } } },
+          cutout: "58%"
+        }
+      });
+    }
+
+    var wsRows = data.workstreamRows.slice(0, 8);
+    var wsCanvas = document.getElementById("exec-workstream-chart");
+    if (wsCanvas && wsRows.length) {
+      new Chart(wsCanvas, {
+        type: "bar",
+        data: {
+          labels: wsRows.map(function (row) { return row.workstream; }),
+          datasets: [{
+            label: "Active open items",
+            data: wsRows.map(function (row) { return row.count; }),
+            backgroundColor: "#0d9488",
+            borderRadius: 7
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
+    }
+
+    var dueCanvas = document.getElementById("exec-due-chart");
+    if (dueCanvas) {
+      new Chart(dueCanvas, {
+        type: "bar",
+        data: {
+          labels: data.dueBuckets.map(function (row) { return row.bucket; }),
+          datasets: [{
+            label: "Open items",
+            data: data.dueBuckets.map(function (row) { return row.count; }),
+            backgroundColor: ["#dc2626", "#d97706", "#f59e0b", "#64748b"],
+            borderRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
+    }
+  }
+
+  function renderExecDashboard() {
+    var root = document.getElementById("exec-dashboard-content");
+    if (!root) return;
+
+    var program = ROADMAP_PROGRAMS[EXEC_SELECTED_PROGRAM] || ROADMAP_PROGRAMS.R18 || normalizeProgram(null, EXEC_SELECTED_PROGRAM);
+    var options = ROADMAP_PROGRAM_ORDER.map(function (key) {
+      var p = ROADMAP_PROGRAMS[key] || normalizeProgram(null, key);
+      return '<option value="' + escapeHtml(key) + '"' + (key === EXEC_SELECTED_PROGRAM ? " selected" : "") + ">" +
+        escapeHtml(p.name || key) + "</option>";
+    }).join("");
+    var cfg = window.SIT_ROADMAP_CONFIG || {};
+    var sourceLink = EXEC_SELECTED_PROGRAM === "R18" && cfg.execDashboardUrl
+      ? '<a class="program-source-link" href="' + escapeHtml(cfg.execDashboardUrl) + '" target="_blank" rel="noopener">Open Coda Exec Dashboard</a>'
+      : "";
+
+    if (EXEC_SELECTED_PROGRAM !== "R18") {
+      var counts = programCounts(program);
+      root.innerHTML =
+        '<div class="exec-toolbar"><label><span>Program</span><select id="exec-program-select">' + options + "</select></label>" + sourceLink + "</div>" +
+        '<div class="program-note">Exec dashboard layout is ready, but this program is still WIP. R18 remains the default executive view until the program dashboard tables are finalized.</div>' +
+        '<div class="exec-kpi-grid">' +
+        '<div class="exec-kpi"><span>Total items</span><strong>' + counts.total + "</strong><small>Current milestone rows available</small></div>" +
+        '<div class="exec-kpi"><span>L1 gates</span><strong>' + counts.l1 + "</strong><small>Program-level gates</small></div>" +
+        '<div class="exec-kpi"><span>Blocked</span><strong>' + counts.blocked + "</strong><small>Needs unblock path</small></div>" +
+        '<div class="exec-kpi"><span>Delayed</span><strong>' + counts.delayed + "</strong><small>Watchlist items</small></div>" +
+        "</div>";
+      var wipSelect = document.getElementById("exec-program-select");
+      if (wipSelect) {
+        wipSelect.addEventListener("change", function () {
+          EXEC_SELECTED_PROGRAM = this.value || "R18";
+          renderExecDashboard();
+        });
+      }
+      return;
+    }
+
+    var data = buildExecDashboard(program);
+    var atRisk = data.blocked.length + data.active.filter(function (item) { return item.st === "wip_delayed"; }).length;
+    var snapshotRows = [
+      { metric: "Total R18 roadmap rows", value: data.items.length, note: data.l1.length + " L1 / " + data.l2.length + " L2 milestones" },
+      { metric: "Active open items", value: data.active.length, note: "Excludes complete, de-scoped, deferred, and not applicable rows" },
+      { metric: "At-risk active items", value: atRisk, note: data.blocked.length + " blocked / " + (atRisk - data.blocked.length) + " delayed" },
+      { metric: "Overdue active items", value: data.overdue.length, note: "Open ETC before today" },
+      { metric: "Due today", value: data.dueToday.length, note: "Open ETC equal to today" },
+      { metric: "Due in next 14 days", value: data.nearTerm.length, note: "Near-term branch-off and integration window" },
+      { metric: "PMB branch-off checklist", value: data.branch.length, note: "Branch readiness and daily-build setup path" }
+    ];
+
+    root.innerHTML =
+      '<div class="exec-toolbar"><label><span>Program</span><select id="exec-program-select">' + options + "</select></label>" + sourceLink + "</div>" +
+      '<div class="exec-summary"><div><p class="eyebrow">R18 Exec Dashboard</p><h2>PMB Readiness and Release Transition</h2></div>' +
+      '<ul><li>R18 has <strong>' + data.active.length + "</strong> active open items across the roadmap.</li>" +
+      '<li>Current active risk is concentrated in <strong>' + data.blocked.length + "</strong> blocked items and <strong>" + (atRisk - data.blocked.length) + "</strong> delayed items.</li>" +
+      '<li>There are <strong>' + data.overdue.length + "</strong> overdue active items and <strong>" + data.nearTerm.length + "</strong> active items due in the next two weeks.</li>" +
+      '<li>The PMB branch-off checklist has <strong>' + data.branch.length + "</strong> tracked items.</li></ul></div>" +
+      '<div class="exec-kpi-grid">' +
+      '<div class="exec-kpi risk"><span>At risk</span><strong>' + atRisk + "</strong><small>Blocked + delayed</small></div>" +
+      '<div class="exec-kpi warn"><span>Overdue</span><strong>' + data.overdue.length + "</strong><small>Open items past ETC</small></div>" +
+      '<div class="exec-kpi"><span>Next 14 days</span><strong>' + data.nearTerm.length + "</strong><small>Near-term pressure</small></div>" +
+      '<div class="exec-kpi"><span>Branch checklist</span><strong>' + data.branch.length + "</strong><small>PMB path to daily build</small></div>" +
+      "</div>" +
+      '<div class="exec-chart-grid">' +
+      '<div class="chart-panel"><h4>Status mix</h4><div class="chart-wrap"><canvas id="exec-status-chart"></canvas></div></div>' +
+      '<div class="chart-panel"><h4>Active workstream load</h4><div class="chart-wrap"><canvas id="exec-workstream-chart"></canvas></div></div>' +
+      '<div class="chart-panel chart-wide"><h4>Schedule pressure</h4><div class="chart-wrap"><canvas id="exec-due-chart"></canvas></div></div>' +
+      "</div>" +
+      execTable("PMB Readiness Snapshot", "Executive scorecard mirrored from the Coda dashboard.", ["Metric", "Value", "Exec note"], snapshotRows, [
+        function (r) { return escapeHtml(r.metric); },
+        function (r) { return "<strong>" + escapeHtml(r.value) + "</strong>"; },
+        function (r) { return escapeHtml(r.note); }
+      ]) +
+      execTable("Status Mix", "All R18 milestone rows by current status.", ["Status", "Count"], data.statusRows, [
+        function (r) { return escapeHtml(r.status); },
+        function (r) { return "<strong>" + escapeHtml(r.count) + "</strong>"; }
+      ]) +
+      execTable("Active Workstream Load", "Open active rows by workstream.", ["Workstream", "Active open count"], data.workstreamRows, [
+        function (r) { return escapeHtml(r.workstream); },
+        function (r) { return "<strong>" + escapeHtml(r.count) + "</strong>"; }
+      ]) +
+      execTable("Critical Path", "Release gates requiring executive visibility.", ["Due", "Signal", "Status", "Milestone", "Owner", "Blocked reason", "Exec note"], data.critical, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        function (r) { return execSignal(r); },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return r.st === "blocked" ? escapeHtml(r.dependency || "-") : "-"; },
+        function (r) { return escapeHtml(r.comments || "-"); }
+      ]) +
+      execTable("Blocked Milestones", "Items needing unblock reason and owner visibility.", ["Due", "Signal", "Milestone", "Workstream", "Owner", "Blocked reason"], data.blocked, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        function (r) { return execSignal(r); },
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.ws || "-"); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.dependency || r.comments || "Not specified"); }
+      ], "No blocked milestones.") +
+      execTable("Overdue Items", "Open milestones with ETC before today.", ["Due", "Signal", "Status", "Milestone", "Workstream", "Owner", "Blocked reason / comment"], data.overdue, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        function (r) { return '<span class="exec-signal blocked"><i></i>Overdue</span>'; },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.ws || "-"); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.dependency || r.comments || "-"); }
+      ], "No overdue active items.") +
+      execTable("Due in Next Two Weeks", "Near-term release transition pressure.", ["Due", "Signal", "Status", "Milestone", "Workstream", "Owner", "Blocked reason / comment"], data.nearTerm, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        function () { return '<span class="exec-signal wip_delayed"><i></i>Due soon</span>'; },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.ws || "-"); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.dependency || r.comments || "-"); }
+      ], "No active items due in the next two weeks.") +
+      execTable("Risk and Decision Watchlist", "Blocked and delayed active rows, sorted by due date.", ["Due", "Signal", "Status", "Milestone", "Workstream", "Owner", "Blocked reason", "Comment"], data.risk.slice(0, 12), [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        function (r) { return execSignal(r); },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.ws || "-"); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.dependency || "-"); },
+        function (r) { return escapeHtml(r.comments || "-"); }
+      ], "No active risks.") +
+      execTable("PMB Branch-Off Checklist", "Branch activation, setup, and daily-build readiness path.", ["Due", "Status", "Milestone", "Owner", "Parent"], data.branch, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.parent || "-"); }
+      ], "No branch-off checklist rows.") +
+      execTable("Fleet Transition / Release Handoff", "Fleet and handoff rows kept visible during release transition.", ["Due", "Status", "Milestone", "Owner", "Exec note"], data.fleet, [
+        function (r) { return escapeHtml(fmtExecDate(r.date)); },
+        execStatusPill,
+        function (r) { return escapeHtml(r.label); },
+        function (r) { return escapeHtml(r.pic || "-"); },
+        function (r) { return escapeHtml(r.comments || r.parent || "-"); }
+      ], "No fleet transition rows.") +
+      execTable("Recommended Exec Cadence", "Operating rhythm for the current release transition.", ["Cadence", "Focus", "Output"], [
+        { cadence: "Daily through branch-off", focus: "Branch checklist, blockers, and build-readiness items due within 48 hours", output: "Clear unblock owner and ETA" },
+        { cadence: "Twice weekly", focus: "Fleet transition, VIP readiness, PMB scaling readiness, and KPI/triage blockers", output: "Exec decision list and readiness trend" },
+        { cadence: "Weekly roadmap review", focus: "Critical path changes, delayed milestones, and carryover into R19/L3 AML", output: "Leadership status summary" }
+      ], [
+        function (r) { return escapeHtml(r.cadence); },
+        function (r) { return escapeHtml(r.focus); },
+        function (r) { return escapeHtml(r.output); }
+      ]);
+
+    var select = document.getElementById("exec-program-select");
+    if (select) {
+      select.addEventListener("change", function () {
+        EXEC_SELECTED_PROGRAM = this.value || "R18";
+        renderExecDashboard();
+      });
+    }
+    renderExecCharts(data);
+  }
+
   function dateRangeFor(items, padDays) {
     padDays = padDays || 4;
     var times = [];
@@ -1045,7 +1459,8 @@
     } catch (e) {}
   }
 
-  window.SIT_REFRESH = function () { refreshAll(); renderProgramRoadmaps(); fireDataReady(); };
+  window.SIT_RENDER_EXEC_DASHBOARD = function () { renderExecDashboard(); };
+  window.SIT_REFRESH = function () { refreshAll(); renderProgramRoadmaps(); renderExecDashboard(); fireDataReady(); };
 
   function refreshAll() {
     var r1 = dateRangeFor(ROADMAP_L1, 5);
@@ -1086,6 +1501,7 @@
     renderChartsL1(ROADMAP_L1);
     renderChartsL2(ROADMAP_L2);
     renderProgramRoadmaps();
+    renderExecDashboard();
   }
 
   function applyOpenSheetLink() {
