@@ -1,5 +1,5 @@
 /**
- * SIT ROADMAP — loads Program Milestones from Google Sheets.
+ * SIT ROADMAP — loads Program Milestones from Coda first, then Google Sheets.
  *
  * ── OPTION A: Google Sign-In / OAuth2 (recommended — sheet stays private) ──
  *   1. oauthClientId → already filled from your project credentials
@@ -36,7 +36,13 @@
     csvExportUrl: "",
 
     /** "Open spreadsheet" link shown in the page header */
-    openSheetUrl: "https://docs.google.com/spreadsheets/d/1UyHzvdtqED7Rz0fDtsvms0V7e_9kcnaDbYKaSaEO5IM/edit?gid=539542201"
+    openSheetUrl: "https://docs.google.com/spreadsheets/d/1UyHzvdtqED7Rz0fDtsvms0V7e_9kcnaDbYKaSaEO5IM/edit?gid=539542201",
+
+    /** Static Coda export generated locally for GitHub Pages */
+    codaJsonUrl: "coda-roadmap-data.json",
+
+    /** "Open Coda source" link shown in the page header */
+    openCodaUrl: "https://coda.io/d/SIT-PMB-Roadmap_dGDLsJnP2Ir/R18-PMB-Milestones_sujMr0sb#R18-Program-Milestones_tujbDyvO"
   };
 
   var qp = new URLSearchParams(window.location.search || "");
@@ -52,6 +58,8 @@
 
   var ROADMAP_L1 = [];
   var ROADMAP_L2 = [];
+  var ROADMAP_PROGRAMS = {};
+  var ROADMAP_PROGRAM_ORDER = ["R18", "R19", "L3"];
 
   var FALLBACK_L1 = [
     { date: "2026-04-22", label: "PMB/Scaling / Diversity Test Plan Strategy", ws: "InCar Testing", st: "progress" },
@@ -426,6 +434,170 @@
       );
     });
     tb.innerHTML = html.join("");
+  }
+
+  function normalizeProgram(program, key) {
+    program = program || {};
+    return {
+      key: program.key || key,
+      name: program.name || key,
+      title: program.title || ((program.name || key) + " PMB Milestones"),
+      sourceUrl: program.sourceUrl || program.sourceURL || "",
+      note: program.note || "",
+      l1: Array.isArray(program.l1) ? program.l1 : [],
+      l2: Array.isArray(program.l2) ? program.l2 : []
+    };
+  }
+
+  function setProgramsFromParsed(parsed) {
+    var programs = {};
+    var order = [];
+    if (parsed && parsed.programs) {
+      order = Array.isArray(parsed.programOrder) && parsed.programOrder.length
+        ? parsed.programOrder.slice()
+        : Object.keys(parsed.programs);
+      order.forEach(function (key) {
+        if (parsed.programs[key]) programs[key] = normalizeProgram(parsed.programs[key], key);
+      });
+      Object.keys(parsed.programs).forEach(function (key) {
+        if (!programs[key]) {
+          programs[key] = normalizeProgram(parsed.programs[key], key);
+          order.push(key);
+        }
+      });
+    }
+
+    if (!order.length) {
+      programs.R18 = normalizeProgram({
+        key: "R18",
+        name: "R18",
+        title: "R18 PMB Milestones",
+        sourceUrl: (window.SIT_ROADMAP_CONFIG || {}).openCodaUrl || "",
+        l1: (parsed && Array.isArray(parsed.l1)) ? parsed.l1 : [],
+        l2: (parsed && Array.isArray(parsed.l2)) ? parsed.l2 : []
+      }, "R18");
+      order = ["R18", "R19", "L3"];
+    }
+
+    ["R18", "R19", "L3"].forEach(function (key) {
+      if (order.indexOf(key) === -1) order.push(key);
+      if (!programs[key]) {
+        programs[key] = normalizeProgram({
+          key: key,
+          name: key === "L3" ? "L3 AML" : key,
+          title: (key === "L3" ? "L3 AML" : key) + " PMB Milestones",
+          note: "No Coda milestone table is published for this program yet."
+        }, key);
+      }
+    });
+
+    ROADMAP_PROGRAMS = programs;
+    ROADMAP_PROGRAM_ORDER = order;
+  }
+
+  function getPrimaryProgram() {
+    return ROADMAP_PROGRAMS.R18 || ROADMAP_PROGRAMS[ROADMAP_PROGRAM_ORDER[0]] || null;
+  }
+
+  function programCounts(program) {
+    var all = (program.l1 || []).concat(program.l2 || []);
+    var blocked = all.filter(function (m) { return m.st === "blocked"; }).length;
+    var delayed = all.filter(function (m) { return m.st === "wip_delayed"; }).length;
+    var complete = all.filter(function (m) { return m.st === "complete"; }).length;
+    return {
+      total: all.length,
+      l1: (program.l1 || []).length,
+      l2: (program.l2 || []).length,
+      blocked: blocked,
+      delayed: delayed,
+      complete: complete
+    };
+  }
+
+  function programTableRows(program) {
+    var rows = (program.l1 || []).concat(program.l2 || [])
+      .slice()
+      .sort(function (a, b) {
+        var ad = a.date ? new Date(a.date).getTime() : 9e15;
+        var bd = b.date ? new Date(b.date).getTime() : 9e15;
+        if (ad !== bd) return ad - bd;
+        return String(a.label || "").localeCompare(String(b.label || ""));
+      })
+      .slice(0, 14);
+    if (!rows.length) {
+      return '<tr><td colspan="6" style="color:var(--muted)">No milestones are available yet.</td></tr>';
+    }
+    return rows.map(function (m) {
+      var st = m.st || "unspecified";
+      return (
+        "<tr><td>" + escapeHtml(m.level || "") + "</td>" +
+        "<td>" + escapeHtml(m.date || "TBD") + "</td>" +
+        "<td>" + escapeHtml(m.label || "") + "</td>" +
+        '<td><span class="ws-tag">' + escapeHtml(m.ws || "-") + "</span></td>" +
+        "<td>" + escapeHtml(m.pic || "-") + "</td>" +
+        '<td><span class="status ' + statusClass(st) + '">' + escapeHtml(statusDisplay(st)) + "</span></td></tr>"
+      );
+    }).join("");
+  }
+
+  function renderProgramRoadmaps() {
+    var root = document.getElementById("program-roadmap-content");
+    if (!root) return;
+
+    root.innerHTML = ROADMAP_PROGRAM_ORDER.map(function (key) {
+      var program = ROADMAP_PROGRAMS[key] || normalizeProgram(null, key);
+      var counts = programCounts(program);
+      var source = program.sourceUrl
+        ? '<a class="program-source-link" href="' + escapeHtml(program.sourceUrl) + '" target="_blank" rel="noopener">Open Coda source</a>'
+        : "";
+      var note = program.note
+        ? '<p class="program-note">' + escapeHtml(program.note) + "</p>"
+        : "";
+      return (
+        '<section class="program-section" id="program-' + escapeHtml(key.toLowerCase()) + '">' +
+        '<div class="program-head">' +
+        '<div><p class="eyebrow">' + escapeHtml(program.name) + '</p><h2>' + escapeHtml(program.title) + "</h2></div>" +
+        source +
+        "</div>" +
+        '<div class="program-metrics">' +
+        '<span><strong>' + counts.total + "</strong> total</span>" +
+        '<span><strong>' + counts.l1 + "</strong> L1</span>" +
+        '<span><strong>' + counts.l2 + "</strong> L2</span>" +
+        '<span><strong>' + counts.blocked + "</strong> blocked</span>" +
+        '<span><strong>' + counts.delayed + "</strong> delayed</span>" +
+        "</div>" +
+        note +
+        '<div class="gantt-card program-gantt-card">' +
+        '<h4>' + escapeHtml(program.name) + " Gantt</h4>" +
+        '<p class="gantt-desc">Milestones are pulled from Coda; dated L1 rows are shown first, with L2 used when no L1 dates exist.</p>' +
+        '<div class="gantt-legend" aria-hidden="true">' +
+        '<span class="lg-complete"><i></i> Complete</span>' +
+        '<span class="lg-progress"><i></i> In progress</span>' +
+        '<span class="lg-blocked"><i></i> Blocked</span>' +
+        '<span class="lg-notstarted"><i></i> Not started</span>' +
+        "</div>" +
+        '<div class="gantt-scroll"><div class="gantt-inner" id="program-gantt-' + escapeHtml(key.toLowerCase()) + '"></div></div>' +
+        "</div>" +
+        '<div class="table-wrap program-table-wrap"><table class="data">' +
+        "<thead><tr><th>Level</th><th>Target</th><th>Milestone</th><th>Workstream</th><th>PIC</th><th>Status</th></tr></thead>" +
+        '<tbody id="program-table-' + escapeHtml(key.toLowerCase()) + '">' + programTableRows(program) + "</tbody>" +
+        "</table></div>" +
+        "</section>"
+      );
+    }).join("");
+
+    ROADMAP_PROGRAM_ORDER.forEach(function (key) {
+      var program = ROADMAP_PROGRAMS[key] || normalizeProgram(null, key);
+      var datedL1 = (program.l1 || []).filter(function (m) { return m.date; });
+      var ganttItems = datedL1.length ? program.l1 : (program.l1 || []).concat(program.l2 || []);
+      var r = dateRangeFor(ganttItems, 12);
+      renderGanttChart("program-gantt-" + key.toLowerCase(), ganttItems, {
+        rangeStart: r.start,
+        rangeEnd: r.end,
+        months: monthBandLabels(r.start, r.end),
+        today: TODAY
+      });
+    });
   }
 
   function dateRangeFor(items, padDays) {
@@ -854,16 +1026,26 @@
   }
 
   function fireDataReady() {
-    window.ROADMAP_DATA = { l1: ROADMAP_L1, l2: ROADMAP_L2 };
+    window.ROADMAP_DATA = {
+      l1: ROADMAP_L1,
+      l2: ROADMAP_L2,
+      programs: ROADMAP_PROGRAMS,
+      programOrder: ROADMAP_PROGRAM_ORDER
+    };
     try {
       document.dispatchEvent(new CustomEvent("roadmapDataReady", {
-        detail: { l1: ROADMAP_L1, l2: ROADMAP_L2 },
+        detail: {
+          l1: ROADMAP_L1,
+          l2: ROADMAP_L2,
+          programs: ROADMAP_PROGRAMS,
+          programOrder: ROADMAP_PROGRAM_ORDER
+        },
         bubbles: false
       }));
     } catch (e) {}
   }
 
-  window.SIT_REFRESH = function () { refreshAll(); fireDataReady(); };
+  window.SIT_REFRESH = function () { refreshAll(); renderProgramRoadmaps(); fireDataReady(); };
 
   function refreshAll() {
     var r1 = dateRangeFor(ROADMAP_L1, 5);
@@ -903,18 +1085,20 @@
 
     renderChartsL1(ROADMAP_L1);
     renderChartsL2(ROADMAP_L2);
+    renderProgramRoadmaps();
   }
 
   function applyOpenSheetLink() {
     var cfg = window.SIT_ROADMAP_CONFIG || {};
     var a = document.getElementById("open-sheet-link");
     if (!a) return;
-    var url = (cfg.openSheetUrl || "").trim();
+    var url = (cfg.openCodaUrl || cfg.openSheetUrl || "").trim();
     if (!url && cfg.spreadsheetId) {
       url = "https://docs.google.com/spreadsheets/d/" + cfg.spreadsheetId + "/edit";
     }
     if (url) {
       a.href = url;
+      a.textContent = cfg.openCodaUrl ? "Open Coda source ↗" : "Open spreadsheet ↗";
       a.hidden = false;
     } else {
       a.hidden = true;
@@ -922,8 +1106,12 @@
   }
 
   function applyParsed(parsed, source) {
-    ROADMAP_L1 = parsed.l1.length ? parsed.l1 : FALLBACK_L1.slice();
-    ROADMAP_L2 = parsed.l2.length ? parsed.l2 : FALLBACK_L2.slice();
+    setProgramsFromParsed(parsed || {});
+    var primary = getPrimaryProgram();
+    var parsedL1 = (parsed && Array.isArray(parsed.l1)) ? parsed.l1 : [];
+    var parsedL2 = (parsed && Array.isArray(parsed.l2)) ? parsed.l2 : [];
+    ROADMAP_L1 = primary && primary.l1.length ? primary.l1 : (parsedL1.length ? parsedL1 : FALLBACK_L1.slice());
+    ROADMAP_L2 = primary && primary.l2.length ? primary.l2 : (parsedL2.length ? parsedL2 : FALLBACK_L2.slice());
     setBanner("Live data from " + source + " (refreshes on page reload).", false);
     refreshAll();
     fireDataReady();
@@ -932,6 +1120,7 @@
   function useFallback(reason) {
     ROADMAP_L1 = FALLBACK_L1.slice();
     ROADMAP_L2 = FALLBACK_L2.slice();
+    setProgramsFromParsed({ l1: ROADMAP_L1, l2: ROADMAP_L2 });
     setBanner(reason, true);
     refreshAll();
     fireDataReady();
@@ -1147,7 +1336,30 @@
   }
 
   /**
-   * OPTION A (recommended) — Load pre-fetched roadmap-data.json.
+   * OPTION A (recommended) — Load pre-fetched coda-roadmap-data.json.
+   * Generated by export-coda-roadmap-data.py. This keeps the Coda token local
+   * while letting GitHub Pages read a static file.
+   */
+  function loadFromCodaJsonFile() {
+    var cfg = window.SIT_ROADMAP_CONFIG || {};
+    var url = (cfg.codaJsonUrl || "coda-roadmap-data.json").trim();
+    setBanner("Loading roadmap data from Coda…", false);
+    return fetch(url + "?_=" + Date.now(), { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error(url + " not found (HTTP " + res.status + ")");
+        return res.json();
+      })
+      .then(function (data) {
+        var hasPrograms = data.programs && Object.keys(data.programs).length;
+        var hasLegacyRows = (data.l1 || []).length || (data.l2 || []).length;
+        if (!hasPrograms && !hasLegacyRows) throw new Error(url + " has no milestones");
+        var ts = data.generated ? " (generated " + data.generated.replace("T", " ").replace("Z", " UTC") + ")" : "";
+        applyParsed(data, "Coda workspace" + ts);
+      });
+  }
+
+  /**
+   * OPTION B — Load pre-fetched roadmap-data.json.
    * Generated by fetch-roadmap-data.py (uses same gspread/token.pickle pattern as GDrive.py).
    * Run the Python script locally whenever the sheet changes, then push to GitHub.
    */
@@ -1176,9 +1388,11 @@
     var spreadsheetId = (cfg.spreadsheetId || "").trim();
     var sheetGid = String(cfg.sheetGid != null ? cfg.sheetGid : "0").trim();
 
-    // OPTION A — roadmap-data.json (from fetch-roadmap-data.py)
-    // Try this first. Falls through to OAuth2 / API key / CSV if not present.
-    return loadFromJsonFile().catch(function () {
+    // OPTION A — coda-roadmap-data.json, then the legacy Google Sheet snapshot.
+    // Falls through to OAuth2 / API key / CSV if static files are not present.
+    return loadFromCodaJsonFile().catch(function () {
+      return loadFromJsonFile();
+    }).catch(function () {
       // OPTION B — OAuth2 Sign-In (sheet stays private)
       if (clientId && spreadsheetId) {
         if (window.google && window.google.accounts && window.google.accounts.oauth2) {

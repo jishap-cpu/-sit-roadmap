@@ -9,6 +9,11 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="$REPO_DIR/update-roadmap.log"
 PYTHON="$REPO_DIR/.venv/bin/python3"
 SCRIPT="$REPO_DIR/fetch-roadmap-data.py"
+CODA_EXPORT_SCRIPT="$REPO_DIR/export-coda-roadmap-data.py"
+
+if [[ ! -x "$PYTHON" ]]; then
+  PYTHON="/usr/bin/python3"
+fi
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"
@@ -22,15 +27,32 @@ cd "$REPO_DIR"
 log "Running fetch-roadmap-data.py…"
 "$PYTHON" "$SCRIPT" >> "$LOG_FILE" 2>&1
 
-# Check if roadmap-data.json actually changed
-if git diff --quiet roadmap-data.json roadmap-history.json roadmap-baseline.json 2>/dev/null && \
-   ! git ls-files --others --exclude-standard | grep -qE "roadmap-(history|baseline)\.json"; then
+# Fetch latest static snapshot from Coda for GitHub Pages
+if [[ -f "$CODA_EXPORT_SCRIPT" ]]; then
+  log "Running export-coda-roadmap-data.py…"
+  "$PYTHON" "$CODA_EXPORT_SCRIPT" >> "$LOG_FILE" 2>&1
+fi
+
+FILES=(
+  roadmap-data.json
+  roadmap-history.json
+  roadmap-baseline.json
+  coda-roadmap-data.json
+  integration-testing-roadmap.html
+  sit-roadmap-loader.js
+  fetch-roadmap-data.py
+  export-coda-roadmap-data.py
+  update-roadmap.sh
+)
+
+# Check if roadmap files actually changed
+if git diff --quiet -- "${FILES[@]}" 2>/dev/null && \
+   [[ -z "$(git ls-files --others --exclude-standard -- "${FILES[@]}")" ]]; then
   log "No changes detected — skipping push."
 else
   TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
   log "Changes detected — committing and pushing…"
-  git add roadmap-data.json roadmap-history.json roadmap-baseline.json \
-          integration-testing-roadmap.html sit-roadmap-loader.js fetch-roadmap-data.py
+  git add -- "${FILES[@]}"
   git commit -m "Auto-update roadmap data ($TIMESTAMP)"
   git push
   log "Pushed successfully."

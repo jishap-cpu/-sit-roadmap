@@ -124,6 +124,45 @@
     .tab-panel { display: none; }
     .tab-panel.is-active { display: block; }
 
+    /* ── Program roadmap sections ── */
+    .program-section {
+      padding: 2rem 0 2.35rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .program-section:first-child { padding-top: 1rem; }
+    .program-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap; margin-bottom: 0.9rem;
+    }
+    .program-head .eyebrow { margin: 0 0 0.35rem; }
+    .program-head h2 { margin-bottom: 0; }
+    .program-source-link {
+      display: inline-flex; align-items: center;
+      padding: 0.38rem 0.7rem; border-radius: 6px;
+      border: 1px solid rgba(13,148,136,0.22);
+      background: rgba(13,148,136,0.08);
+      color: var(--accent); font-weight: 700; font-size: 0.86rem;
+      text-decoration: none;
+    }
+    .program-source-link:hover { background: rgba(13,148,136,0.14); }
+    .program-metrics {
+      display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 0 0 1rem;
+    }
+    .program-metrics span {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.36rem 0.65rem; border-radius: 6px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--muted); font-size: 0.84rem; font-weight: 600;
+    }
+    .program-metrics strong { color: var(--text); font-size: 0.95rem; }
+    .program-note {
+      margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem;
+      padding: 0.85rem 1rem; border-radius: 8px;
+      background: rgba(217,119,6,0.07); border: 1px solid rgba(217,119,6,0.18);
+    }
+    .program-gantt-card { margin-bottom: 1rem; }
+    .program-table-wrap { margin-top: 0.75rem; }
+
     /* ── Shared section ── */
     section {
       padding: 2.5rem 0;
@@ -610,7 +649,7 @@
     .l2-hint { margin-top: 0.75rem; font-size: 0.88rem; color: var(--muted); }
     footer { padding: 2rem 0 0; color: var(--muted); font-size: 0.88rem; font-style: italic; }
     .muted { color: var(--muted); }
-    strong { color: #f1f5f9; font-weight: 600; }
+    strong { color: var(--text); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -622,31 +661,32 @@
 
     <!-- ── HERO ── -->
     <header class="hero">
-      <p class="eyebrow">Integration &amp; Testing · R18 Program</p>
+      <p class="eyebrow">Integration &amp; Testing · Program Roadmap</p>
       <h1>SIT ROADMAP</h1>
       <p class="hero-sub">
-        Live milestones from your <strong>Google Sheet</strong>. Three views — workstreams, features, and milestones — are interlinked: click any workstream tag or feature gate to cross-navigate.
-        <a id="open-sheet-link" class="sheet-link" href="#" target="_blank" rel="noopener" hidden>Open spreadsheet ↗</a>
+        Live milestones from your <strong>Coda workspace</strong>, with R18, R19, and L3 sections. R18 keeps the detailed workstream, feature, and milestone views for execution review.
+        <a id="open-sheet-link" class="sheet-link" href="#" target="_blank" rel="noopener" hidden>Open Coda source ↗</a>
       </p>
       <div class="hero-meta">
         <span class="pill">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
-          ETC from sheet column
+          ETC from Coda
         </span>
         <span class="pill">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Google Sheet CSV
+          Auto-sync snapshot
         </span>
         <span class="pill">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          3 interlinked views
+          R18 · R19 · L3
         </span>
       </div>
     </header>
 
     <!-- ── TAB NAV ── -->
     <nav class="tab-nav" aria-label="Main views">
-      <button class="tab-btn is-active" data-tab="workstreams">Workstreams</button>
+      <button class="tab-btn is-active" data-tab="programs">Programs</button>
+      <button class="tab-btn" data-tab="workstreams">Workstreams</button>
       <button class="tab-btn" data-tab="features">R18 Product Features</button>
       <button class="tab-btn" data-tab="milestones">R18 Milestones</button>
     </nav>
@@ -654,9 +694,22 @@
     <div id="data-source-banner" class="data-banner" role="status" hidden></div>
 
     <!-- ════════════════════════════════════════
+         TAB 0 — PROGRAMS
+    ════════════════════════════════════════ -->
+    <div id="tab-programs" class="tab-panel is-active">
+      <section>
+        <h2>Program Roadmaps</h2>
+        <p class="lead">Roadmap sections grouped by release program. The R18 section is sourced from the <strong>R18 PMB Milestones</strong> Coda table and rendered as a Gantt view.</p>
+        <div id="program-roadmap-content" style="color:var(--muted);font-size:0.95rem">
+          Loading program roadmaps…
+        </div>
+      </section>
+    </div>
+
+    <!-- ════════════════════════════════════════
          TAB 1 — WORKSTREAMS
     ════════════════════════════════════════ -->
-    <div id="tab-workstreams" class="tab-panel is-active">
+    <div id="tab-workstreams" class="tab-panel">
       <section>
         <h2>Workstreams</h2>
         <p class="lead">All L1 and L2 milestones grouped by delivery workstream. Blocked counts and the status bar give instant health at a glance. Click <strong>"View all in Milestones →"</strong> to filter the Milestones view to that workstream — workstream tags in the milestone table link back here.</p>
@@ -1004,14 +1057,14 @@
     </div><!-- /tab-milestones -->
 
     <footer>
-      Update the Google Sheet then refresh. Configure the CSV URL in <code>sit-roadmap-loader.js</code> if the banner says the sheet did not load.
+      Update the Coda workspace; the local sync job refreshes the GitHub Pages snapshot automatically.
     </footer>
 
   </div><!-- /wrap -->
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="sit-roadmap-loader.js?v=20260424"></script>
+  <script src="sit-roadmap-loader.js?v=20260519"></script>
   <script>
   (function () {
     "use strict";
@@ -1024,7 +1077,7 @@
     }
 
     /* ── Tab system ── */
-    var activeTab = "workstreams";
+    var activeTab = "programs";
     var activeMsFilter = null;
 
     function switchTab(name) {
